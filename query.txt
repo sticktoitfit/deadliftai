@@ -1,0 +1,6 @@
+Summarize the primary principles of powerlifting programming found in this notebook. 
+Specifically, please address:
+1. The overall periodization structure (e.g. Accumulation, Intensification, Peaking).
+2. Intensity and Volume targets (Percentage vs RPE) for each block.
+3. The specific structure of a single workout session (e.g. Primary lift, Accessories, Warmups).
+4. Any mandatory rules for frequency and rest.

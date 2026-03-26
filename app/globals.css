@@ -1,1 +1,63 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: oklch(0.14 0.02 265); /* Deep dark blue/purple tint */
+  --color-surface: oklch(0.2 0.03 265);
+  --color-surface-hover: oklch(0.25 0.04 265);
+  
+  --color-primary: oklch(0.7 0.15 200); /* Cyan/electric blue */
+  --color-primary-glow: oklch(0.7 0.15 200 / 0.5);
+  --color-accent: oklch(0.65 0.25 320); /* Magenta/pink */
+
+  --color-text-primary: oklch(0.95 0.01 265);
+  --color-text-secondary: oklch(0.7 0.02 265);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  :root {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+  }
+
+  /* Futuristic Typography details */
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative bg-primary text-background font-bold px-6 py-4 rounded-2xl w-full flex items-center justify-center transition-all duration-500 hover:scale-[1.02] hover:brightness-125 active:scale-[0.98];
+    box-shadow: 0 8px 30px var(--color-primary-glow);
+  }
+  
+  .btn-primary:hover {
+    filter: brightness(1.25);
+    transform: scale(1.02);
+    box-shadow: 0 0 40px var(--color-primary-glow);
+  }
+  
+  .btn-primary:active {
+    @apply scale-[0.96];
+    filter: brightness(0.9);
+    box-shadow: 0 4px 20px var(--color-primary-glow);
+  }
+
+  .nav-blur {
+    @apply bg-surface/80 backdrop-blur-xl border-t border-white/5;
+  }
+
+  /* Utility to hide standard scrollbars while keeping functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
