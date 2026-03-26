@@ -45,13 +45,14 @@ function HomeContent() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-background overflow-hidden">
       {/* Hero Background Animation */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-80" />
-        <div className="absolute inset-0 bg-background/40 z-10" />
+        {/* Top mask to hide any image artifacts on mobile devices with notches */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-background z-20 pointer-events-none md:hidden" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-90" />
+        <div className="absolute inset-0 bg-background/30 z-10" />
         <img 
-          src="/assets/misc/backgorundgif.gif" 
+          src="/assets/misc/background-hero.gif" 
           alt="Hero Background" 
-          className="w-full h-full object-cover mix-blend-screen opacity-40 animate-pulse-slow"
+          className="w-full h-full object-cover object-bottom mix-blend-screen opacity-40 animate-pulse-slow"
         />
       </div>
 
