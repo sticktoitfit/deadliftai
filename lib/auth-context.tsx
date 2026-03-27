@@ -183,7 +183,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           getRedirectResult(auth),
           new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 8000))
         ]).catch(err => {
-          logDebug(`Redirect check: ${err instanceof Error ? err.message : 'failed'}`);
+          const code = err?.code || "unknown";
+          logDebug(`Redirect Error: [${code}]`);
           return null;
         }) as any;
         
