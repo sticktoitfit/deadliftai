@@ -139,6 +139,18 @@ function AuthContent() {
         <BrandLogo size={64} glow={true} />
         <div className="flex flex-col items-center gap-2">
            <p className="text-xs tracking-widest uppercase text-text-secondary animate-pulse">Stage 2: Core Handshake...</p>
+           {/* Real-time Handshake Logs */}
+           {debugLog.length > 0 && (
+             <div className="w-full mt-4 p-4 rounded-xl bg-black/40 border border-white/5 font-mono text-[9px] space-y-1 animate-in fade-in slide-in-from-bottom-2">
+               <p className="text-white/20 mb-2 uppercase font-black text-center">Boot Sequence Logs</p>
+               {debugLog.map((log, i) => (
+                 <div key={i} className="flex gap-2">
+                   <span className="text-primary/40">[{i}]</span>
+                   <span className="text-text-secondary text-wrap">{log}</span>
+                 </div>
+               ))}
+             </div>
+           )}
            <button 
              onClick={() => {
                alert("OVERRIDING HANDSHAKE...");
