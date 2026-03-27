@@ -25,6 +25,7 @@ import {
 import BrandLogo from "@/components/ui/BrandLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { PassiveQuote } from "@/components/ui/PassiveQuote";
+import DashboardIntro from "@/components/ui/DashboardIntro";
 import {
   prescribeNextSession,
   prescribeFullWeek,
@@ -97,6 +98,11 @@ export default function WorkoutPage() {
     document.body.style.width = '';
 
     loadProgram();
+
+    // Check if user needs intro
+    if (userProfile && !userProfile.preferences?.hasSeenDashboardIntro) {
+      setShowIntro(true);
+    }
   }, [loading, user, userProfile]);
 
   async function loadProgram() {
@@ -178,6 +184,17 @@ export default function WorkoutPage() {
 
   const [showFrequencyDialog, setShowFrequencyDialog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
+  const { updatePreferences } = useAuth();
+
+  async function completeIntro() {
+    setShowIntro(false);
+    try {
+      await updatePreferences({ hasSeenDashboardIntro: true });
+    } catch (e) {
+      console.error("Failed to update intro preference:", e);
+    }
+  }
 
   async function updateFrequency(newFreq: number) {
     if (!user) return;
@@ -229,7 +246,9 @@ export default function WorkoutPage() {
   const phaseInfo = PHASE_LABELS[phase] ?? PHASE_LABELS.accumulation;
 
   return (
-    <div className="max-w-3xl mx-auto w-full px-4 md:px-8 py-4 md:py-8 space-y-6 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <>
+      {showIntro && <DashboardIntro onComplete={completeIntro} />}
+      <div className="max-w-3xl mx-auto w-full px-4 md:px-8 py-4 md:py-8 space-y-6 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="pt-4 mb-2 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div className="flex-1">
@@ -611,5 +630,6 @@ export default function WorkoutPage() {
         </div>
       </div>
     </div>
-  );
+  </>
+);
 }

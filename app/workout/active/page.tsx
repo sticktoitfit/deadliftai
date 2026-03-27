@@ -410,21 +410,21 @@ function ActiveWorkoutContent() {
       </div>
 
       {/* Progression Breadcrumb */}
-      <div className="pt-2 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-4">
+      <div className="pt-2 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div className="flex-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-80 flex items-center gap-2">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-60 flex items-center gap-2">
             <span>{todayStr}</span>
             <span className="text-white/20 font-bold">•</span>
-            <span className="text-primary font-bold">Session {weeklySessions + 1} / {targetFrequency}</span>
+            <span className="text-primary font-bold uppercase">Session {weeklySessions + 1} / {targetFrequency} Flow</span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {movements.map((m, idx) => (
               <div key={idx} className="flex items-center gap-2">
                  <div className={cn(
                    "px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all duration-500",
-                   idx === currentMovementIndex ? "bg-primary border-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-105" :
-                   idx < currentMovementIndex ? "bg-white/5 border-white/20 text-white/30" :
-                   "bg-surface border-white/5 text-text-secondary"
+                   idx === currentMovementIndex ? "bg-primary border-primary text-white shadow-[0_0_25px_rgba(59,130,246,0.3)] scale-105" :
+                   idx < currentMovementIndex ? "bg-white/5 border-white/20 text-white/20" :
+                   "bg-surface border-white/5 text-text-secondary opacity-40"
                  )}>
                     {m.name}
                  </div>
@@ -442,52 +442,38 @@ function ActiveWorkoutContent() {
         </button>
       </div>
 
-      {/* Movement Header */}
-      <div className="py-4 border-b border-white/5 mb-6">
-        <p className="text-text-secondary text-[10px] tracking-[0.2em] font-black uppercase mb-1">
-          {currentMovement.type} movement
-        </p>
-        <div className="flex items-center justify-between">
-           <div className="flex items-center gap-3">
-             <h1 className="text-xl font-black tracking-tight">{currentMovement.name}</h1>
-             {currentMovement.alternatives && currentMovement.alternatives.length > 0 && (
-               <button 
-                 onClick={() => {
-                   setShowSwapModal(currentMovementIndex);
-                   setShowFullWorkout(true);
-                 }}
-                 className="p-1.5 rounded-md bg-white/5 text-text-secondary hover:text-white transition-colors"
-                 title="Alternative choices"
-               >
-                 <RefreshCw size={12} />
-               </button>
-             )}
-           </div>
-           <div className="flex items-center gap-2">
-            <span className="text-text-secondary text-xs font-bold">Set {currentSetIndex + 1}</span>
-            <span className="text-white/10">/</span>
-            <span className="text-text-secondary text-xs font-bold">{currentMovement.sets.length}</span>
-          </div>
-        </div>
-      </div>
-
       {/* Primary Display */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-2 py-8 relative">
+      <div className="flex-1 flex flex-col items-center justify-center gap-2 py-4 relative text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 blur-[80px] -z-10" />
         
-        <p className="text-text-secondary text-[10px] uppercase font-black tracking-widest mb-2">{currentSetData.label}</p>
+        {/* Movement Detail */}
+        <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+          <p className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-3 opacity-60">Executing</p>
+          <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-white leading-tight uppercase max-w-sm mx-auto">
+            {currentMovement.name}
+          </h2>
+          <div className="flex items-center justify-center gap-3 mt-4">
+             <div className="h-[1px] w-8 bg-white/10" />
+             <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary">
+               Set {currentSetIndex + 1} of {currentMovement.sets.length}
+             </p>
+             <div className="h-[1px] w-8 bg-white/10" />
+          </div>
+        </div>
+
+        <p className="text-text-secondary text-[10px] uppercase font-black tracking-widest mb-1">{currentSetData.label}</p>
         
         <div className="text-center group">
           <span className={cn(
             "font-black font-mono text-white leading-none transition-transform duration-500 hover:scale-105 inline-block",
-            currentSetData.weight > 0 ? "text-9xl" : "text-8xl italic text-primary"
+            currentSetData.weight > 0 ? "text-8xl md:text-9xl" : "text-8xl italic text-primary"
           )}>
             {currentSetData.weight > 0 ? currentSetData.weight : "RPE"}
           </span>
-          {currentSetData.weight > 0 && <span className="text-xl text-text-secondary font-black ml-2 uppercase">lbs</span>}
+          {currentSetData.weight > 0 && <span className="text-2xl text-text-secondary font-black ml-3 uppercase">lbs</span>}
         </div>
         
-        <p className="text-2xl font-black text-text-secondary mt-4">
+        <p className="text-3xl font-black text-text-secondary mt-6">
           Perform <span className="text-white">{currentSetData.reps}</span> reps
         </p>
 

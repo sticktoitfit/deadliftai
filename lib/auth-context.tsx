@@ -46,6 +46,7 @@ export interface UserProfile {
   };
   preferences?: {
     showQuotes: boolean;
+    hasSeenDashboardIntro?: boolean;
   };
 }
 
