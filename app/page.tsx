@@ -45,6 +45,7 @@ function HomeContent() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-background overflow-hidden">
       {/* Hero Background Animation */}
+      <div className="absolute inset-0 z-0">
         {/* Top mask to hide any image artifacts on mobile devices with notches */}
         <div className="absolute top-0 left-0 right-0 h-32 bg-background z-20 pointer-events-none md:hidden" />
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-90" />
