@@ -40,16 +40,22 @@ export function PassiveQuote({ className }: PassiveQuoteProps) {
   if (!mounted || !quote || !showQuotes) return <div className={className} style={{ minHeight: '3em' }} />;
 
   return (
-    <div className={`text-center max-w-[280px] mx-auto space-y-1.5 transition-all duration-1000 animate-in fade-in zoom-in-95 ${className}`}>
-      <p className="text-[10px] font-medium leading-relaxed italic text-text-secondary/60">
-        "{quote.text}"
-      </p>
-      <div className="flex items-center justify-center gap-2">
-        <div className="h-[1px] w-4 bg-primary/20" />
-        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-primary/40">
+    <div className={`text-center max-w-lg mx-auto py-12 px-6 space-y-4 transition-all duration-1000 animate-in fade-in zoom-in-95 ${className}`}>
+      <div className="relative flex flex-col items-center">
+        {/* Neon Core Glow */}
+        <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full -z-10 animate-pulse" />
+        
+        <p className="text-2xl md:text-3xl font-black leading-tight italic text-white drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
+          "{quote.text}"
+        </p>
+      </div>
+      
+      <div className="flex items-center justify-center gap-4">
+        <div className="h-[2px] w-12 bg-gradient-to-r from-transparent to-primary" />
+        <p className="text-sm font-black uppercase tracking-[0.4em] text-primary drop-shadow-[0_0_12px_rgba(var(--color-primary),0.5)]">
           {quote.author}
         </p>
-        <div className="h-[1px] w-4 bg-primary/20" />
+        <div className="h-[2px] w-12 bg-gradient-to-l from-transparent to-primary" />
       </div>
     </div>
   );

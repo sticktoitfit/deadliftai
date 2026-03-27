@@ -139,12 +139,22 @@ export default function WeeklyHubPage() {
         ))}
       </div>
 
-      <div className="mt-12 p-8 rounded-[2.5rem] bg-primary/5 border border-primary/10 text-center">
-        <Calendar size={32} className="text-primary mx-auto mb-4" />
-        <h3 className="font-black text-lg mb-2 leading-tight">Block Continuity</h3>
-        <p className="text-sm text-text-secondary leading-relaxed max-w-sm mx-auto">
+      <div className="mt-12 p-8 rounded-[3rem] bg-primary/5 border border-primary/20 text-center relative overflow-hidden group">
+        <div className="absolute top-0 left-1/4 w-32 h-32 bg-primary/10 blur-[80px] -z-10" />
+        <Calendar size={40} className="text-primary mx-auto mb-6" />
+        <h3 className="font-black text-2xl mb-3 leading-tight">Microcycle Strategy</h3>
+        <p className="text-sm text-text-secondary leading-relaxed max-w-sm mx-auto mb-10">
           This hub adapts in real-time. As you finish sessions, the intensity of upcoming days adjusts based on your actual performance and RPE trends.
         </p>
+        <button
+          onClick={() => router.push("/workout")}
+          className="btn-primary w-full max-w-xs mx-auto py-5 relative z-10"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <ChevronLeft size={20} />
+            <span>Return to Dashboard</span>
+          </div>
+        </button>
       </div>
     </div>
   );

@@ -213,7 +213,7 @@ export default function WorkoutPage() {
         <BrandLogo size={64} glow={false} className="opacity-40" />
         <div className="text-center space-y-3">
           <p className="text-text-secondary text-xs tracking-widest uppercase font-black">Building Program…</p>
-          <PassiveQuote className="opacity-20" />
+          <PassiveQuote className="opacity-100" />
         </div>
       </div>
     );
@@ -247,14 +247,14 @@ export default function WorkoutPage() {
         <div className="flex gap-2 sm:gap-3 shrink-0 items-center">
           <button 
             onClick={() => router.push("/workout/week")}
-            className="bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/40 rounded-2xl px-4 sm:px-5 py-2.5 sm:py-3 transition-all duration-300 group flex items-center gap-2 sm:gap-3 shrink-0"
+            className="bg-white/5 border border-white/20 hover:bg-white/10 hover:border-primary/60 rounded-3xl px-6 sm:px-8 py-4 transition-all duration-300 group flex items-center gap-4 shrink-0 shadow-lg shadow-black/20"
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-              <Layout size={16} className="sm:size-[18px]" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 transition-all border border-primary/20">
+              <Layout size={20} className="sm:size-[24px]" />
             </div>
             <div className="text-left">
-               <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-text-secondary group-hover:text-white transition-colors">Birdseye View</p>
-               <p className="text-[11px] sm:text-xs font-bold text-white leading-none">Weekly Hub</p>
+               <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-text-secondary group-hover:text-white transition-colors">Birdseye View</p>
+               <p className="text-xs sm:text-sm font-black text-white leading-tight">Weekly Hub</p>
             </div>
           </button>
 
@@ -422,21 +422,23 @@ export default function WorkoutPage() {
               <button
                 onClick={() => logSessionStart(p.lift as any, p)}
                 className={cn(
-                  "h-16 font-black uppercase tracking-widest text-xs",
+                  "h-16 font-black uppercase tracking-widest text-xs rounded-2xl w-full flex items-center justify-center transition-all duration-300",
                   isNext 
-                    ? "btn-primary" 
-                    : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 rounded-2xl w-full flex items-center justify-center transition-all duration-300"
+                    ? "btn-glow-trail text-primary border border-primary/20" 
+                    : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10"
                 )}
               >
-                {isDone ? "Repeat Session" : isNext ? "Start Session" : "Start Session"}
-                <ChevronRight size={18} />
+                <div className="flex items-center gap-2">
+                  {isDone ? "Repeat Session" : isNext ? "Start Session" : "Start Session"}
+                  <ChevronRight size={18} />
+                </div>
               </button>
             </div>
           );
         })}
       </div>
 
-      <PassiveQuote className="my-12 opacity-30" />
+      <PassiveQuote className="my-12 opacity-100" />
 
       {/* Futuristic Analytics HUD */}
       <div className="bg-surface/30 backdrop-blur-md rounded-[3rem] p-10 border border-white/5 relative overflow-hidden group shadow-2xl transition-all duration-700 hover:border-primary/20">

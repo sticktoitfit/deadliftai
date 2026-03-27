@@ -17,8 +17,11 @@ function HomeContent() {
   const [signupHref, setSignupHref] = useState("/auth?tab=signup");
   const [loginHref, setLoginHref] = useState("/auth?tab=login");
 
-  // Dynamic routing logic only
+  // Dynamic routing and scroll lock
   useEffect(() => {
+    // Lock scroll on landing page
+    document.body.style.overflow = 'hidden';
+
     if (!loading) {
       if (user) {
         if (userProfile?.onboardingComplete) {
@@ -37,13 +40,17 @@ function HomeContent() {
         setLoginHref("/auth?tab=login");
       }
     }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [loading, user, userProfile, router, setSignupHref, setLoginHref]);
 
   return (
-    <div className="relative h-[100dvh] w-full flex flex-col items-center justify-center bg-background overflow-hidden selection:bg-primary selection:text-background">
+    <div className="relative h-[100dvh] w-full flex flex-col items-center justify-center bg-background overflow-hidden selection:bg-primary selection:text-background border-t border-white/[0.02]">
       {/* Hero Background Animation */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-90" />
         <div className="absolute inset-0 bg-background/20 z-10" />
         <img 
           src="/assets/misc/background-hero.gif" 

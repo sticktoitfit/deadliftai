@@ -639,7 +639,7 @@ export default function ActiveWorkout() {
       <div className="flex flex-col items-center justify-center min-h-[85vh] gap-6 animate-pulse">
         <BrandLogo size={64} glow={false} className="opacity-20" />
         <div className="text-text-secondary text-xs font-black tracking-widest uppercase">Initialising Flow…</div>
-        <PassiveQuote className="opacity-20" />
+        <PassiveQuote className="opacity-100" />
       </div>
     }>
       <ActiveWorkoutContent />
