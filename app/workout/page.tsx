@@ -453,10 +453,13 @@ export default function WorkoutPage() {
         <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/5 blur-[100px] -z-10 group-hover:bg-primary/10 transition-all duration-1000" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-accent/5 blur-[100px] -z-10 group-hover:bg-accent/10 transition-all duration-1000" />
         
-        <div className="flex items-center justify-center mb-12 relative z-10 border-b border-white/10 pb-8">
+        <div className="flex flex-col items-center justify-center mb-12 relative z-10 border-b border-white/10 pb-8">
           <h2 className="text-xs font-black uppercase tracking-[0.6em] text-white">
             Peak Performance Matrix
           </h2>
+          <p className="text-[7px] font-black uppercase tracking-[0.3em] text-primary mt-2 opacity-50">
+            Interactive Analysis • Tap any gauge
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 relative z-10 max-w-2xl mx-auto">
@@ -536,14 +539,23 @@ export default function WorkoutPage() {
                   />
                   
                   {/* Outer Ring Pulse (Subtle Interactive Cue) */}
-                  <div className="absolute inset-2 border border-white/5 rounded-full -z-10 group-hover/gauge:scale-125 group-hover/gauge:opacity-0 group-hover/gauge:border-primary/40 transition-all duration-1000" />
+                  <div className={cn(
+                    "absolute inset-0 border border-white/10 rounded-full -z-10 transition-all duration-1000",
+                    "group-hover/gauge:scale-125 group-hover/gauge:opacity-0 group-hover/gauge:border-primary/40",
+                    "animate-[pulse_4s_infinite_ease-in-out]"
+                  )} />
+                  <div className="absolute inset-[-4px] border border-white/5 rounded-full -z-20 opacity-20 pointer-events-none" />
                 </div>
 
                 {/* Label + sparkline */}
-                <div className="text-center">
-                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 group-hover/gauge:text-white transition-all mb-2">
-                    {LIFT_LABELS[lift]}
-                  </p>
+                <div className="text-center relative">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 group-hover/gauge:text-white transition-all">
+                      {LIFT_LABELS[lift]}
+                    </p>
+                    <Maximize2 size={10} className="text-white/20 group-hover/gauge:text-primary transition-colors duration-500" />
+                  </div>
+                  
                   <svg viewBox="0 0 80 12" className="w-24 h-4 opacity-20 group-hover/gauge:opacity-100 group-hover/gauge:translate-y-[-2px] transition-all duration-500 mx-auto overflow-visible">
                     {/* Shadow Pulse (Phantom Frequency) */}
                     <path
@@ -564,6 +576,11 @@ export default function WorkoutPage() {
                       className="drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
                     />
                   </svg>
+
+                  {/* Pre-hover Affordance Hint (Always subtly visible) */}
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover/gauge:opacity-100 transition-opacity duration-300">
+                     <span className="text-[7px] font-black uppercase tracking-widest text-primary/60">Tap to expand</span>
+                  </div>
                 </div>
               </div>
             );
