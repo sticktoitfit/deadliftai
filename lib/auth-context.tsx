@@ -236,25 +236,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Firebase Auth is not available.");
       }
 
-      const isMobile = /iPhone|iPad|iPod|Android|Mobi|Tablet/i.test(navigator.userAgent);
-      
       let result: UserCredential | null = null;
 
-      if (isMobile || forceRedirect) {
-        logDebug("Triggering Google Redirect...");
+      // Manual Redirect override (useful if popups are permanently blocked)
+      if (forceRedirect) {
+        logDebug("Direct Redirect triggered...");
         await signInWithRedirect(auth, googleProvider);
-        // On redirect, this promise won't ever "resolve" or return 
-        // because the page is about to unload.
-        return { isNewUser: false }; 
-      } else {
-        logDebug("Triggering Google Popup...");
-        try {
-          result = await signInWithPopup(auth, googleProvider);
-          logDebug(`Popup Handshake Result: ${result ? "Success" : "Empty"}`);
-        } catch (err: any) {
-          const code = err?.code || "unknown-error";
-          logDebug(`Popup Failed: [${code}]`);
-          throw err; 
+        return { isNewUser: false };
+      }
+
+      // Primary strategy: try Popup (typically smoother on mobile)
+      try {
+        logDebug("Opening Google Popup...");
+        result = await signInWithPopup(auth, googleProvider);
+        logDebug(`Result: ${result ? "Success" : "Empty"}`);
+      } catch (err: any) {
+        const code = err?.code || "unknown-error";
+        
+        // Final fallback: redirect if popup fails or is blocked
+        if (code === "auth/popup-blocked" || code.includes("closed-by-user")) {
+          logDebug(`Handshake blocked [${code}] — Pivoting to Redirect.`);
+          await signInWithRedirect(auth, googleProvider);
+          return { isNewUser: false }; 
+        } else {
+          logDebug(`Login Error: [${code}]`);
+          throw err;
         }
       }
 
