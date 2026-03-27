@@ -58,14 +58,14 @@ function AuthContent() {
     }
   }, [successRoute, router]);
 
-  const handleGoogle = async (e?: React.MouseEvent) => {
+  const handleGoogle = async (e?: React.MouseEvent, mode: 'popup' | 'redirect' = 'popup') => {
     if (e) e.preventDefault();
-    logDebug("Google button clicked");
+    logDebug(`Google (${mode}) triggered`);
     setIsLoading(true);
     setError(null);
     try {
-      logDebug("Requesting Google Sign-In...");
-      const { isNewUser } = await signInWithGoogle();
+      logDebug(`Requesting Google Sign-In via ${mode}...`);
+      const { isNewUser } = await signInWithGoogle(mode === 'redirect');
       logDebug(`Sign-in complete. New User: ${isNewUser}`);
       
       if (isNewUser) {
@@ -188,25 +188,35 @@ function AuthContent() {
 
       <div className="w-full flex flex-col gap-5">
         {/* Google Button */}
-        <button
-          id="google-signin-btn"
-          type="button"
-          onClick={handleGoogle}
-          disabled={isLoading}
-          className="
-            flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold
-            bg-white text-gray-900 hover:bg-gray-100 transition-all duration-200
-            shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-60
-          "
-        >
-          <svg width="20" height="20" viewBox="0 0 48 48">
-            <path fill="#4285F4" d="M43.6 20.2H42V20H24v8h11.3C33.7 32.6 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.3 6.7 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.8z"/>
-            <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.3 6.7 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
-            <path fill="#FBBC05" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.6 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.2l-6.4 4.9C7.1 39.7 15 44 24 44z"/>
-            <path fill="#EA4335" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2C40.9 36.1 44 30.6 44 24c0-1.3-.1-2.6-.4-3.8z"/>
-          </svg>
-          Continue with Google
-        </button>
+        <div className="flex flex-col gap-2">
+          <button
+            id="google-signin-btn"
+            type="button"
+            onClick={handleGoogle}
+            disabled={isLoading}
+            className="
+              flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold
+              bg-white text-gray-900 hover:bg-gray-100 transition-all duration-200
+              shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-60
+            "
+          >
+            <svg width="20" height="20" viewBox="0 0 48 48">
+              <path fill="#4285F4" d="M43.6 20.2H42V20H24v8h11.3C33.7 32.6 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.3 6.7 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.8z"/>
+              <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.3 6.7 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+              <path fill="#FBBC05" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.6 26.8 36 24 36c-5.2 0-9.6-3.3-11.3-8H6.2l-6.4 4.9C7.1 39.7 15 44 24 44z"/>
+              <path fill="#EA4335" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2C40.9 36.1 44 30.6 44 24c0-1.3-.1-2.6-.4-3.8z"/>
+            </svg>
+            {isLoading ? "Communicating..." : "Continue with Google"}
+          </button>
+          
+            <button 
+              type="button"
+              onClick={() => handleGoogle(undefined, 'redirect')}
+              className="mt-1 text-[10px] text-text-secondary hover:text-white uppercase font-bold tracking-widest transition-colors py-1"
+            >
+              Trouble with popups? Try Redirect Mode
+            </button>
+        </div>
 
         {/* Divider */}
         <div className="flex items-center gap-3">
@@ -313,6 +323,19 @@ function AuthContent() {
             )}
           </button>
         </form>
+
+        {/* Debug Log (Visible on error or interaction) */}
+        {(debugLog.length > 0 || error) && (
+          <div className="mt-8 p-4 rounded-xl bg-black/40 border border-white/5 font-mono text-[10px] space-y-1">
+            <p className="text-white/20 mb-2 uppercase font-black">System Diagnostic Logs</p>
+            {debugLog.map((log, i) => (
+              <div key={i} className="flex gap-2">
+                <span className="text-primary/50">[{i}]</span>
+                <span className="text-text-secondary text-wrap">{log}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Bottom spacer */}
         <div className="mt-8" />

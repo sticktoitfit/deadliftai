@@ -52,7 +52,7 @@ interface AuthContextValue {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<{ isNewUser: boolean }>;
+  signInWithGoogle: (forceRedirect?: boolean) => Promise<{ isNewUser: boolean }>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -189,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Helper: Sign in with Google Popup
    * Checks for existing profile or creates a stub for new users
    */
-  const signInWithGoogle = async (): Promise<{ isNewUser: boolean }> => {
+  const signInWithGoogle = async (forceRedirect = false): Promise<{ isNewUser: boolean }> => {
     try {
       if (!auth) {
         setInitError("System Offline: Firebase Auth is not available.");
@@ -198,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const isMobile = /iPhone|iPad|iPod|Android|Mobi|Tablet/i.test(navigator.userAgent);
       
-      if (isMobile) {
+      if (isMobile || forceRedirect) {
         await signInWithRedirect(auth, googleProvider);
         // On redirect, this promise won't ever "resolve" or return 
         // because the page is about to unload.
