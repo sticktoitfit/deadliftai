@@ -453,31 +453,32 @@ export default function WorkoutPage() {
         <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/5 blur-[100px] -z-10 group-hover:bg-primary/10 transition-all duration-1000" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-accent/5 blur-[100px] -z-10 group-hover:bg-accent/10 transition-all duration-1000" />
         
-        <div className="flex flex-col items-center justify-center mb-12 relative z-10 border-b border-white/10 pb-8">
-          <h2 className="text-xs font-black uppercase tracking-[0.6em] text-white">
+        <div className="flex flex-col items-center justify-center text-center w-full mb-12 relative z-10 border-b border-white/10 pb-8">
+          <h2 className="text-xs font-black uppercase tracking-[0.6em] text-white/90">
             Peak Performance Matrix
           </h2>
-          <p className="text-[7px] font-black uppercase tracking-[0.3em] text-primary mt-2 opacity-50">
-            Interactive Analysis • Tap any gauge
-          </p>
+          <div className="mt-4 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 animate-bounce">
+            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">
+              Tap any gauge to probe stats
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 relative z-10 max-w-2xl mx-auto">
           {(["squat", "bench", "deadlift"] as Lift[]).map((lift, idx) => {
             const target = meetTargets[lift];
-            // Arc math: viewBox 160x160, center at 80,80, r=54 → 26px clearance on all sides
+            // Arc math
             const r = 54;
             const circ = 2 * Math.PI * r;
-            // Show 270° arc (75% of circle), leaving a 90° gap at bottom-left
             const trackDash = circ * 0.75;
             const trackGap  = circ * 0.25;
-            const fillDash  = circ * 0.55; // ~73% filled = visually satisfying
+            const fillDash  = circ * 0.55; 
             const fillGap   = circ - fillDash;
 
             const colors = [
-              { stroke: "#22d3ee", glow: "rgba(34,211,238,0.5)"  },  // cyan  — squat
-              { stroke: "#a78bfa", glow: "rgba(167,139,250,0.5)" },  // violet — bench
-              { stroke: "#fb923c", glow: "rgba(251,146,60,0.5)"  },  // amber — deadlift
+              { stroke: "#22d3ee", glow: "rgba(34,211,238,0.5)"  },
+              { stroke: "#a78bfa", glow: "rgba(167,139,250,0.5)" },
+              { stroke: "#fb923c", glow: "rgba(251,146,60,0.5)"  },
             ];
             const { stroke, glow } = colors[idx];
 
@@ -485,8 +486,17 @@ export default function WorkoutPage() {
               <div 
                 key={lift} 
                 onClick={() => router.push(`/workout/matrix/${lift}`)}
-                className="flex flex-col items-center gap-4 group/gauge cursor-pointer"
+                className="flex flex-col items-center gap-4 group/gauge cursor-pointer relative"
               >
+                {/* FLOATING AFFORDANCE HINT (only for the first one as a cue) */}
+                {idx === 0 && (
+                  <div className="absolute -top-6 -right-12 z-20 pointer-events-none animate-bounce hidden sm:block">
+                    <div className="bg-primary text-white text-[8px] font-black uppercase px-2 py-1 rounded-md shadow-lg flex items-center gap-1">
+                      <span>Probing Active</span>
+                      <RotateCcw size={8} className="animate-spin-slow" />
+                    </div>
+                  </div>
+                )}
                 {/* Self-contained SVG gauge */}
                 <div className="relative w-36 h-36 group-hover/gauge:scale-110 transition-transform duration-500">
                   <svg viewBox="0 0 160 160" className="w-full h-full rotate-[-225deg]">
