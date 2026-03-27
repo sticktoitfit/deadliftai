@@ -19,7 +19,8 @@ import {
   Clock,
   ArrowUp,
   RotateCcw,
-  LogOut
+  LogOut,
+  Maximize2
 } from "lucide-react";
 import BrandLogo from "@/components/ui/BrandLogo";
 import { useAuth } from "@/hooks/useAuth";
@@ -88,6 +89,12 @@ export default function WorkoutPage() {
     if (loading) return;
     if (!user) { router.replace("/auth"); return; }
     if (!userProfile?.onboardingComplete) { router.replace("/onboarding"); return; }
+
+    // Force scroll restoration on mount to prevent stale lock from Landing/Auth pages
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
 
     loadProgram();
   }, [loading, user, userProfile]);
@@ -504,8 +511,8 @@ export default function WorkoutPage() {
                     />
                   </svg>
 
-                  {/* Centred text */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+                  {/* Centred text (Grows and shifts on hover to make room for 'VIEW') */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 group-hover/gauge:-translate-y-2 transition-transform duration-500">
                     <span className="text-3xl font-black font-mono tracking-tight leading-none text-white group-hover/gauge:text-primary transition-colors">
                       {target}
                     </span>
@@ -514,11 +521,22 @@ export default function WorkoutPage() {
                     </span>
                   </div>
 
+                  {/* Hidden 'VIEW' affordance that slides up on hover */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pt-10 opacity-0 group-hover/gauge:opacity-100 group-hover/gauge:translate-y-2 transition-all duration-500 pointer-events-none">
+                     <div className="flex items-center gap-1.5 text-primary">
+                       <span className="text-[11px] font-black uppercase tracking-[0.25em] drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">View Details</span>
+                       <Maximize2 size={12} className="stroke-[3]" />
+                     </div>
+                  </div>
+
                   {/* Matrix Hover Illumination Glow Overlay */}
                   <div 
-                    className="absolute inset-0 -z-10 bg-gradient-to-tr from-transparent to-white/5 opacity-0 group-hover/gauge:opacity-100 blur-2xl transition-opacity duration-700"
+                    className="absolute inset-0 -z-10 bg-gradient-to-tr from-transparent to-white/5 opacity-0 group-hover/gauge:opacity-100 blur-2xl transition-opacity duration-700 pointer-events-none"
                     style={{ backgroundColor: `${stroke}10` }}
                   />
+                  
+                  {/* Outer Ring Pulse (Subtle Interactive Cue) */}
+                  <div className="absolute inset-2 border border-white/5 rounded-full -z-10 group-hover/gauge:scale-125 group-hover/gauge:opacity-0 group-hover/gauge:border-primary/40 transition-all duration-1000" />
                 </div>
 
                 {/* Label + sparkline */}
