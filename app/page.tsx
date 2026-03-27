@@ -19,8 +19,11 @@ function HomeContent() {
 
   // Dynamic routing and scroll lock
   useEffect(() => {
-    // Lock scroll on landing page
+    // Strict lock for all root elements
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
 
     if (!loading) {
       if (user) {
@@ -43,11 +46,18 @@ function HomeContent() {
 
     return () => {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      document.body.style.position = 'unset';
+      document.body.style.width = 'unset';
     };
   }, [loading, user, userProfile, router, setSignupHref, setLoginHref]);
 
   return (
-    <div className="relative h-[100dvh] w-full flex flex-col items-center justify-center bg-background overflow-hidden selection:bg-primary selection:text-background border-t border-white/[0.02]">
+    <div className="relative h-[100dvh] w-full flex flex-col items-center justify-center bg-background overflow-hidden selection:bg-primary selection:text-background touch-none">
+      {/* Strict Edge Darkness */}
+      <div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-black via-black/80 to-transparent z-40 pointer-events-none" />
+      <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black via-black/80 to-transparent z-40 pointer-events-none" />
+
       {/* Hero Background Animation */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-90" />

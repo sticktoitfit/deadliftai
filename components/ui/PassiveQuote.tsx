@@ -40,22 +40,22 @@ export function PassiveQuote({ className }: PassiveQuoteProps) {
   if (!mounted || !quote || !showQuotes) return <div className={className} style={{ minHeight: '3em' }} />;
 
   return (
-    <div className={`text-center max-w-lg mx-auto py-12 px-6 space-y-4 transition-all duration-1000 animate-in fade-in zoom-in-95 ${className}`}>
+    <div className={`text-center max-w-sm mx-auto py-8 px-6 space-y-3 transition-all duration-1000 animate-in fade-in zoom-in-95 ${className}`}>
       <div className="relative flex flex-col items-center">
-        {/* Neon Core Glow */}
-        <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full -z-10 animate-pulse" />
+        {/* Subdued Glow */}
+        <div className="absolute inset-0 bg-primary/5 blur-[80px] rounded-full -z-10" />
         
-        <p className="text-2xl md:text-3xl font-black leading-tight italic text-white drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
+        <p className="text-base md:text-lg font-bold leading-relaxed italic text-white/90 drop-shadow-sm">
           "{quote.text}"
         </p>
       </div>
       
-      <div className="flex items-center justify-center gap-4">
-        <div className="h-[2px] w-12 bg-gradient-to-r from-transparent to-primary" />
-        <p className="text-sm font-black uppercase tracking-[0.4em] text-primary drop-shadow-[0_0_12px_rgba(var(--color-primary),0.5)]">
+      <div className="flex items-center justify-center gap-3">
+        <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-primary/40" />
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">
           {quote.author}
         </p>
-        <div className="h-[2px] w-12 bg-gradient-to-l from-transparent to-primary" />
+        <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-primary/40" />
       </div>
     </div>
   );
