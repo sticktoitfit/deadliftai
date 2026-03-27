@@ -347,32 +347,32 @@ function ActiveWorkoutContent() {
                   <div className="space-y-2">
                     {m.sets.map((s, sIdx) => (
                       <div key={sIdx} className="flex items-center justify-between text-xs py-2 border-b border-white/[0.03] last:border-0 opacity-80">
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">Set {sIdx + 1}: {s.label}</span>
-                        <div className="flex gap-4 font-bold">
+                        <span className="font-mono text-xs font-black uppercase tracking-widest text-text-secondary">Set {sIdx + 1}: {s.label}</span>
+                        <div className="flex gap-6 font-black text-xl">
                           <span className={cn(
-                            s.weight > 0 ? "text-white" : "text-primary/70 italic"
+                            s.weight > 0 ? "text-white" : "text-primary shadow-[0_0_10px_rgba(var(--color-primary),0.2)] font-bold italic"
                           )}>
                             {s.weight > 0 ? `${s.weight} lbs` : "RPE"}
                           </span>
-                          <span className="text-text-secondary w-12 text-right">× {s.reps}</span>
-                          <span className="text-primary w-12 text-right">@ {s.rpeTarget}</span>
+                          <span className="text-text-secondary/80 w-16 text-right">× {s.reps}</span>
+                          <span className="text-primary w-16 text-right">@ {s.rpeTarget}</span>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {showSwapModal === idx && (
-                    <div className="mt-4 pt-4 border-t border-white/5 animate-in slide-in-from-top-2">
+                    <div className="mt-4 pt-4 border-t border-white/10 animate-in slide-in-from-top-2">
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-text-secondary">Closest Equivalents</p>
-                        <p className="text-[8px] text-primary/60 italic font-medium">Adjust weight as needed</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-text-secondary">Closest Equivalents</p>
+                        <p className="text-[10px] text-primary italic font-medium">Adjust weight as needed</p>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {m.alternatives?.map(alt => (
                           <button
                             key={alt}
                             onClick={() => swapMovement(idx, alt)}
-                            className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold hover:bg-primary/20 transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-bold hover:bg-primary/20 transition-colors"
                           >
                             {alt}
                           </button>
@@ -421,10 +421,10 @@ function ActiveWorkoutContent() {
             {movements.map((m, idx) => (
               <div key={idx} className="flex items-center gap-2">
                  <div className={cn(
-                   "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-500",
+                   "px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all duration-500",
                    idx === currentMovementIndex ? "bg-primary border-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-105" :
                    idx < currentMovementIndex ? "bg-white/5 border-white/20 text-white/30" :
-                   "bg-surface border-white/5 text-text-secondary opacity-50"
+                   "bg-surface border-white/5 text-text-secondary"
                  )}>
                     {m.name}
                  </div>

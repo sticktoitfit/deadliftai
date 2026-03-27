@@ -67,13 +67,25 @@ export default function MatrixDetailPage({
   // Scrubber — null means the tooltip is hidden
   const [scrubWeek, setScrubWeek] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-
   // ── Data load ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (loading) return;
     if (!user) { router.replace("/auth"); return; }
     loadData();
   }, [loading, user, lift]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Robust scroll lock for landing page only
+  useEffect(() => {
+    // Lock scroll on landing page for the deep-immersion HUD aesthetic
+    // This effect should ideally be in the landing page component itself.
+    // For functional pages like MatrixDetailPage, we ensure it's unset.
+    document.body.style.overflow = 'unset'; // Ensure scroll is enabled for functional pages
+
+    // Safety check: ensure it's removed on unmount to prevent leak to other pages
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []); // Only run once on mount for this page to ensure scroll is unset
 
   async function loadData() {
     if (!user || !userProfile?.onboardingData) return;
@@ -221,7 +233,7 @@ export default function MatrixDetailPage({
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background text-white -mx-4 md:-mx-8 px-6 md:px-16 pb-16 overflow-hidden selection:bg-primary/30">
+    <div className="min-h-screen bg-background text-white -mx-4 md:-mx-8 px-6 md:px-16 pb-16 selection:bg-primary/30">
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />

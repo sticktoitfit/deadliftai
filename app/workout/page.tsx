@@ -373,14 +373,14 @@ export default function WorkoutPage() {
             >
               {isDone && (
                 <div className="absolute top-6 right-8 text-green-400 flex items-center gap-2">
-                  <CheckCircle2 size={16} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Completed</span>
+                  <CheckCircle2 size={18} />
+                  <span className="text-xs font-black uppercase tracking-widest">Completed</span>
                 </div>
               )}
               
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-text-secondary/80">
                     Session {idx + 1} / {targetFrequency}
                   </span>
                 </div>
@@ -390,29 +390,29 @@ export default function WorkoutPage() {
 
                 <div className="flex items-center gap-6">
                   <div>
-                     <p className="text-[10px] text-text-secondary uppercase mb-1 font-bold tracking-wider">Top Set</p>
+                     <p className="text-xs text-text-secondary/80 uppercase mb-1.5 font-bold tracking-wider">Top Set</p>
                      <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-black font-mono text-white leading-none">
+                      <span className="text-5xl font-black font-mono text-white leading-none">
                         {topSet.weight}
                       </span>
-                      <span className="text-text-secondary font-black text-xs uppercase">lbs</span>
+                      <span className="text-text-secondary font-black text-sm uppercase">lbs</span>
                      </div>
                   </div>
-                  <div className="h-10 w-px bg-white/10" />
+                  <div className="h-12 w-px bg-white/20" />
                   <div>
-                    <p className="text-[10px] text-text-secondary uppercase mb-1 font-bold tracking-wider">Target</p>
-                    <p className="text-2xl font-black font-mono text-white leading-none">
+                    <p className="text-xs text-text-secondary/80 uppercase mb-1.5 font-bold tracking-wider">Target</p>
+                    <p className="text-3xl font-black font-mono text-white leading-none">
                       {topSet.reps} @ {topSet.rpeTarget}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4 mb-8 pt-6 border-t border-white/5">
+              <div className="space-y-4 mb-8 pt-6 border-t border-white/10">
                 {p.movements.slice(0, 3).map((m, mIdx) => (
-                  <div key={mIdx} className="flex items-center justify-between text-sm">
-                    <span className="text-text-secondary font-bold text-[10px] uppercase tracking-wider">{m.name}</span>
-                    <span className="font-mono text-[10px] font-black text-white/30">
+                  <div key={mIdx} className="flex items-center justify-between text-base">
+                    <span className="text-white font-bold text-sm uppercase tracking-wider">{m.name}</span>
+                    <span className="font-mono text-sm font-black text-white/60">
                       {m.sets.length} SETS
                     </span>
                   </div>
@@ -422,14 +422,14 @@ export default function WorkoutPage() {
               <button
                 onClick={() => logSessionStart(p.lift as any, p)}
                 className={cn(
-                  "h-14 font-black uppercase tracking-widest text-[10px]",
+                  "h-16 font-black uppercase tracking-widest text-xs",
                   isNext 
                     ? "btn-primary" 
-                    : "bg-white/5 text-white/40 border border-white/5 hover:bg-white/10 rounded-2xl w-full flex items-center justify-center transition-all duration-300"
+                    : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 rounded-2xl w-full flex items-center justify-center transition-all duration-300"
                 )}
               >
                 {isDone ? "Repeat Session" : isNext ? "Start Session" : "Start Session"}
-                <ChevronRight size={16} />
+                <ChevronRight size={18} />
               </button>
             </div>
           );
@@ -444,8 +444,8 @@ export default function WorkoutPage() {
         <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/5 blur-[100px] -z-10 group-hover:bg-primary/10 transition-all duration-1000" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-accent/5 blur-[100px] -z-10 group-hover:bg-accent/10 transition-all duration-1000" />
         
-        <div className="flex items-center justify-center mb-12 relative z-10 border-b border-white/5 pb-8">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-text-secondary">
+        <div className="flex items-center justify-center mb-12 relative z-10 border-b border-white/10 pb-8">
+          <h2 className="text-xs font-black uppercase tracking-[0.6em] text-white">
             Peak Performance Matrix
           </h2>
         </div>

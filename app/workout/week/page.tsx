@@ -66,7 +66,7 @@ export default function WeeklyHubPage() {
   if (loading || pageLoading) return <div className="p-8 text-center animate-pulse text-text-secondary uppercase tracking-widest text-xs">Generating Microcycle...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-6 duration-700">
+    <div className="max-w-3xl mx-auto px-6 md:px-10 pb-20 animate-in fade-in slide-in-from-bottom-6 duration-700">
       <header className="py-8">
         <button 
           onClick={() => router.back()}
@@ -76,14 +76,14 @@ export default function WeeklyHubPage() {
           <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
         </button>
         
-        <div className="flex items-end justify-between">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">Microcycle Overview</p>
-            <h1 className="text-4xl font-black tracking-tight">Weekly Hub</h1>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-none">Weekly Hub</h1>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-60 mb-1">Current</p>
-            <p className="text-xl font-black tracking-tight">Week {currentWeek}</p>
+          <div className="md:text-right shrink-0">
+            <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-60 mb-1">Current Status</p>
+            <p className="text-xl font-black tracking-tight text-white">Week {currentWeek}</p>
           </div>
         </div>
       </header>
@@ -102,8 +102,8 @@ export default function WeeklyHubPage() {
                 <Layout size={20} />
               </div>
               <div>
-                <h3 className="font-black text-xl tracking-tight capitalize">{session.lift} Focus</h3>
-                <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-60">Session {idx + 1} / {weeklyPlan.length}</p>
+                <h3 className="font-black text-2xl tracking-tight capitalize">{session.lift} Focus</h3>
+                <p className="text-xs font-black uppercase tracking-widest text-text-secondary opacity-80">Session {idx + 1} / {weeklyPlan.length}</p>
               </div>
             </div>
 
@@ -113,17 +113,17 @@ export default function WeeklyHubPage() {
                 return (
                   <div key={mIdx} className="bg-white/[0.02] rounded-2xl p-4 flex items-center justify-between border border-white/5 group-hover:border-white/10 transition-all">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-primary/70 mb-1">{m.type}</span>
-                      <span className="font-bold text-sm">{m.name}</span>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">{m.type}</span>
+                      <span className="font-bold text-base text-white">{m.name}</span>
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-right">
-                        <span className="block text-[8px] font-black uppercase tracking-widest text-text-secondary mb-0.5">Loads</span>
-                        <span className="font-mono text-xs font-bold">{topSet.weight} lbs</span>
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-text-secondary mb-1">Loads</span>
+                        <span className="font-mono text-sm font-bold text-white">{topSet.weight} lbs</span>
                       </div>
                       <div className="text-right">
-                        <span className="block text-[8px] font-black uppercase tracking-widest text-text-secondary mb-0.5">Prescription</span>
-                        <span className="font-mono text-xs font-bold">{m.sets.length} × {topSet.reps} @ {topSet.rpeTarget}</span>
+                        <span className="block text-[10px] font-black uppercase tracking-widest text-text-secondary mb-1">Prescription</span>
+                        <span className="font-mono text-sm font-bold text-white">{m.sets.length} × {topSet.reps} @ {topSet.rpeTarget}</span>
                       </div>
                     </div>
                   </div>
@@ -131,9 +131,9 @@ export default function WeeklyHubPage() {
               })}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-white/5 flex items-start gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
-              <Info size={14} className="shrink-0 mt-0.5 text-primary" />
-              <p className="text-xs text-text-secondary leading-relaxed">{session.overallNote}</p>
+            <div className="mt-6 pt-6 border-t border-white/10 flex items-start gap-3 opacity-90 group-hover:opacity-100 transition-opacity">
+              <Info size={16} className="shrink-0 mt-0.5 text-primary" />
+              <p className="text-sm text-text-secondary leading-relaxed">{session.overallNote}</p>
             </div>
           </div>
         ))}
