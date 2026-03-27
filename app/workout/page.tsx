@@ -489,7 +489,7 @@ export default function WorkoutPage() {
                 {/* FLOATING INTERACTION STICKER (Fixed to the ring) */}
                 <div className="absolute top-0 right-0 z-20 pointer-events-none animate-bounce flex flex-col items-center">
                   <div className="bg-primary/20 backdrop-blur-md border border-primary/40 text-primary text-[6px] font-black uppercase px-2 py-0.5 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                    Probe Analysis
+                    Lift Progress Analysis
                   </div>
                   <div className="w-[1px] h-4 bg-gradient-to-b from-primary/40 to-transparent" />
                 </div>
