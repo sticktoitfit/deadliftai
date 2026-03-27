@@ -12,6 +12,7 @@ import {
   setPersistence,
   browserLocalPersistence,
   type User,
+  type UserCredential,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -72,4 +73,5 @@ export {
   setPersistence,
   browserLocalPersistence,
   type User,
+  type UserCredential,
 };

@@ -21,6 +21,7 @@ import {
   setPersistence,
   browserLocalPersistence,
   type User,
+  type UserCredential,
 } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
@@ -236,14 +237,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const isMobile = /iPhone|iPad|iPod|Android|Mobi|Tablet/i.test(navigator.userAgent);
       
+      let result: UserCredential | null = null;
+
       if (isMobile || forceRedirect) {
+        logDebug("Triggering Google Redirect...");
         await signInWithRedirect(auth, googleProvider);
         // On redirect, this promise won't ever "resolve" or return 
         // because the page is about to unload.
         return { isNewUser: false }; 
+      } else {
+        logDebug("Triggering Google Popup...");
+        try {
+          result = await signInWithPopup(auth, googleProvider);
+          logDebug(`Popup Handshake Result: ${result ? "Success" : "Empty"}`);
+        } catch (err: any) {
+          const code = err?.code || "unknown-error";
+          logDebug(`Popup Failed: [${code}]`);
+          throw err; 
+        }
       }
 
-      const result = await signInWithPopup(auth, googleProvider);
+      if (!result) {
+        // This case should ideally not be reached if popup was successful,
+        // but good for type safety and explicit handling.
+        return { isNewUser: false };
+      }
+
       const uid = result.user.uid;
       
       const existingProfile = await fetchProfile(uid);
