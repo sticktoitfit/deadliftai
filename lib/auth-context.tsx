@@ -60,6 +60,8 @@ interface AuthContextValue {
   updatePreferences: (prefs: Partial<UserProfile["preferences"]>) => Promise<void>;
   initError: string | null;
   forceReady: () => void;
+  logDebug: (msg: string) => void;
+  debugLog: string[];
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -73,6 +75,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+
+  const logDebug = useCallback((msg: string) => {
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const formatted = `${timestamp}: ${msg}`;
+    console.log(`[AUTH-DEBUG]: ${formatted}`);
+    setDebugLog(prev => {
+      const next = [...prev.slice(-9), formatted];
+      try { sessionStorage.setItem('auth_debug_logs', JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  // Sync logs on mount
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('auth_debug_logs');
+      if (saved) { setDebugLog(JSON.parse(saved)); }
+    } catch {}
+  }, []);
 
 
 
@@ -144,33 +166,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, 12000);
 
     const initAuth = async () => {
-      console.log("[AUTH-INIT]: Starting init sequence...");
+      logDebug("Auth initializing...");
       try {
         if (!auth) {
-           console.error("[AUTH-INIT]: Auth object not found.");
-           throw new Error("Firebase Auth service not ready.");
+           throw new Error("SDK Load Failure");
         }
         
-        console.log("[AUTH-INIT]: Setting persistence...");
+        logDebug("Syncing persistence...");
         await setPersistence(auth, browserLocalPersistence);
-        console.log("[AUTH-INIT]: Persistence set.");
         
-        console.log("[AUTH-INIT]: Checking redirect result...");
+        logDebug("Scanning for redirect result...");
         const result = await Promise.race([
           getRedirectResult(auth),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("Redirect check timeout")), 8000))
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 8000))
         ]).catch(err => {
-          console.warn("[AUTH-INIT]: Skipping redirect result due to error/timeout:", err);
+          logDebug(`Redirect check: ${err instanceof Error ? err.message : 'failed'}`);
           return null;
         }) as any;
-        console.log("[AUTH-INIT]: Redirect result check finished.", result ? "Result found" : "No result");
         
         if (result) {
           const uid = result.user.uid;
-          console.log("[AUTH-INIT]: Processing redirect for UID:", uid);
+          logDebug(`Handshake successful for UID ${uid.slice(0,5)}...`);
           const existingProfile = await fetchProfile(uid);
           if (!existingProfile) {
-            console.log("[AUTH-INIT]: Creating new profile for redirect user...");
+            logDebug("Generating skeleton profile...");
             await setDoc(doc(db, "users", uid), {
               uid,
               email: result.user.email,
@@ -182,14 +201,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               isGuest: false,
             });
           }
-          console.log("[AUTH-INIT]: Setting session cookie...");
-          document.cookie = `fb-session=1; path=/; max-age=86400; SameSite=Lax`;
+          logDebug("Commiting session cookie...");
+          const isSecure = window.location.protocol === "https:";
+          document.cookie = `fb-session=1; path=/; max-age=86400; SameSite=${isSecure ? 'None' : 'Lax'}; ${isSecure ? 'Secure' : ''}`;
+        } else {
+          logDebug("Standby: Ready for interaction.");
         }
-        console.log("[AUTH-INIT]: Initialization complete.");
         setLoading(false);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        console.error("[AUTH-INIT]: FAILED:", msg);
+        logDebug(`Auth Init Error: ${msg}`);
         setInitError(msg);
         setLoading(false);
       } finally {
@@ -303,6 +324,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updatePreferences,
         initError,
         forceReady: () => setLoading(false),
+        logDebug,
+        debugLog,
       }}
     >
       {children}

@@ -11,7 +11,17 @@ type Tab = "login" | "signup";
 function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail, userProfile, user, loading, forceReady } = useAuth();
+  const { 
+    signInWithGoogle, 
+    signInWithEmail, 
+    signUpWithEmail, 
+    userProfile, 
+    user, 
+    loading, 
+    forceReady,
+    logDebug,
+    debugLog 
+  } = useAuth();
   const [hasRedirected, setHasRedirected] = useState(false);
   const [tab, setTab] = useState<Tab>("login");
   const [email, setEmail] = useState("");
@@ -21,18 +31,6 @@ function AuthContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successRoute, setSuccessRoute] = useState<{ url: string, message: string } | null>(null);
-  const [debugLog, setDebugLog] = useState<string[]>([]);
-
-  const logDebug = (msg: string) => {
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const formatted = `${timestamp}: ${msg}`;
-    console.log(`[AUTH-DEBUG]: ${formatted}`);
-    setDebugLog(prev => {
-      const next = [...prev.slice(-9), formatted];
-      try { sessionStorage.setItem('auth_debug_logs', JSON.stringify(next)); } catch {}
-      return next;
-    });
-  };
 
   // Sync tab with URL search params
   useEffect(() => {
@@ -40,14 +38,6 @@ function AuthContent() {
     if (requestedTab === "login" || requestedTab === "signup") {
       setTab(requestedTab);
     }
-    
-    // Load persisted logs
-    try {
-      const saved = sessionStorage.getItem('auth_debug_logs');
-      if (saved) {
-        setDebugLog(JSON.parse(saved));
-      }
-    } catch {}
   }, [searchParams]);
 
   // Handle automatic redirect if user becomes authenticated (fixes mobile redirect hang)
