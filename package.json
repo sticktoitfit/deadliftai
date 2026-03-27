@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "git add . && git commit -m 'Auto-deploy' && git push origin master"
   },
   "dependencies": {
     "clsx": "^2.1.1",

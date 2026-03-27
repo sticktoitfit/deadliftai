@@ -9,7 +9,13 @@
 - [x] Restored app availability on port 3002.
 - [x] Fixed redirect loop caused by cookie mismatch.
 - [x] Successfully verified UI with Browser Agent.
+- [x] **Deployment Pipeline**: Verified GitHub and Netlify connection; successfully pushed and deployed commit `4de4364`.
+- [x] **Automation**: Added `npm run deploy` script to `package.json` for one-command GitHub push and Netlify deployment.
 
 ## Current Status
-The app is stable and running on port 3002. Authentication redirection is working correctly.
-No pending bugs identified in the current workflow.
+- **Availability**: The app is stable and running on port 3002.
+- **CI/CD**: Fully operational. Local → GitHub → Netlify pipeline is verified.
+- **UI**: Hero section mask and dark mode aesthetics verified live on `https://deadliftai.netlify.app`.
+
+No pending bugs identified.
+

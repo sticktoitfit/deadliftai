@@ -27,8 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
-      <body className="min-h-screen pb-24">
-        {/* pb-24 ensures content doesn't get hidden behind the 80px bottom nav */}
+      <body className="min-h-screen">
         <AuthProvider>
           <main className="relative w-full min-h-screen overflow-x-hidden">
             {children}

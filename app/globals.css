@@ -61,3 +61,22 @@
     scrollbar-width: none;
   }
 }
+
+@keyframes scan {
+  from { transform: translateY(0); opacity: 0; }
+  50% { opacity: 1; }
+  to { transform: translateY(100dvh); opacity: 0; }
+}
+
+@keyframes progress-loading {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.animate-scan {
+  animation: scan 8s linear infinite;
+}
+
+.animate-progress-loading {
+  animation: progress-loading 3s ease-in-out infinite;
+}
