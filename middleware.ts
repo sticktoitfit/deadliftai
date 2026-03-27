@@ -30,9 +30,7 @@ export default function proxy(req: NextRequest) {
     return NextResponse.redirect(workoutUrl);
   }
 
-  const response = NextResponse.next();
-  response.headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
