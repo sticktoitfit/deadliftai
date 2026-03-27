@@ -62,6 +62,21 @@ function AuthContent() {
     }
   }, [successRoute, router]);
 
+  // Apply strict scroll lock to login/signup page
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      document.body.style.position = 'unset';
+      document.body.style.width = 'unset';
+    };
+  }, []);
+
   const handleGoogle = async (e?: React.MouseEvent, mode: 'popup' | 'redirect' = 'popup') => {
     if (e) e.preventDefault();
     logDebug(`Google (${mode}) triggered`);

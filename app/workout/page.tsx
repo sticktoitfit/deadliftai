@@ -379,40 +379,40 @@ export default function WorkoutPage() {
               )}
               
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-text-secondary/80">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary/60">
                     Session {idx + 1} / {targetFrequency}
                   </span>
                 </div>
-                <h3 className="text-3xl font-black tracking-tight capitalize mb-6">
+                <h3 className="text-2xl font-black tracking-tight capitalize mb-6">
                    {p.lift} Focus
                 </h3>
 
                 <div className="flex items-center gap-6">
                   <div>
-                     <p className="text-xs text-text-secondary/80 uppercase mb-1.5 font-bold tracking-wider">Top Set</p>
+                     <p className="text-[10px] text-text-secondary/60 uppercase mb-1.5 font-black tracking-wider">Top Set</p>
                      <div className="flex items-baseline gap-1.5">
-                      <span className="text-5xl font-black font-mono text-white leading-none">
+                      <span className="text-4xl font-black font-mono text-white leading-none">
                         {topSet.weight}
                       </span>
-                      <span className="text-text-secondary font-black text-sm uppercase">lbs</span>
+                      <span className="text-text-secondary/60 font-black text-[10px] uppercase">lbs</span>
                      </div>
                   </div>
-                  <div className="h-12 w-px bg-white/20" />
+                  <div className="h-10 w-px bg-white/10" />
                   <div>
-                    <p className="text-xs text-text-secondary/80 uppercase mb-1.5 font-bold tracking-wider">Target</p>
-                    <p className="text-3xl font-black font-mono text-white leading-none">
+                    <p className="text-[10px] text-text-secondary/60 uppercase mb-1.5 font-black tracking-wider">Target</p>
+                    <p className="text-2xl font-black font-mono text-white leading-none">
                       {topSet.reps} @ {topSet.rpeTarget}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4 mb-8 pt-6 border-t border-white/10">
+              <div className="space-y-3 mb-8 pt-6 border-t border-white/5">
                 {p.movements.slice(0, 3).map((m, mIdx) => (
-                  <div key={mIdx} className="flex items-center justify-between text-base">
-                    <span className="text-white font-bold text-sm uppercase tracking-wider">{m.name}</span>
-                    <span className="font-mono text-sm font-black text-white/60">
+                  <div key={mIdx} className="flex items-center justify-between">
+                    <span className="text-white/80 font-bold text-xs uppercase tracking-wider">{m.name}</span>
+                    <span className="font-mono text-[10px] font-black text-white/40">
                       {m.sets.length} SETS
                     </span>
                   </div>

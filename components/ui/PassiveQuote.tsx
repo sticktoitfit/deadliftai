@@ -40,22 +40,19 @@ export function PassiveQuote({ className }: PassiveQuoteProps) {
   if (!mounted || !quote || !showQuotes) return <div className={className} style={{ minHeight: '3em' }} />;
 
   return (
-    <div className={`text-center max-w-sm mx-auto py-8 px-6 space-y-3 transition-all duration-1000 animate-in fade-in zoom-in-95 ${className}`}>
-      <div className="relative flex flex-col items-center">
-        {/* Subdued Glow */}
-        <div className="absolute inset-0 bg-primary/5 blur-[80px] rounded-full -z-10" />
-        
-        <p className="text-base md:text-lg font-bold leading-relaxed italic text-white/90 drop-shadow-sm">
+    <div className={`text-center max-w-[280px] mx-auto py-6 px-4 space-y-2.5 transition-all duration-1000 animate-in fade-in zoom-in-95 ${className}`}>
+      <div className="relative">
+        <p className="text-sm font-medium leading-relaxed italic text-white drop-shadow-sm">
           "{quote.text}"
         </p>
       </div>
       
       <div className="flex items-center justify-center gap-3">
-        <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-primary/40" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">
+        <div className="h-[1px] w-6 bg-primary/30" />
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">
           {quote.author}
         </p>
-        <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-primary/40" />
+        <div className="h-[1px] w-6 bg-primary/30" />
       </div>
     </div>
   );
