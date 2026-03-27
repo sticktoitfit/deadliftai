@@ -103,10 +103,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log("[AUTH-STATE]: Change detected. User:", firebaseUser ? firebaseUser.uid : "NULL");
       setUser(firebaseUser);
 
       if (firebaseUser) {
         try {
+          console.log("[AUTH-STATE]: Fetching profile for:", firebaseUser.uid);
           const profile = await fetchProfile(firebaseUser.uid);
           setUserProfile(profile);
           // Set a session cookie for middleware (if any)
@@ -139,21 +141,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const safetyTimer = setTimeout(() => {
       console.warn("Auth initialization timed out. Forcing UI ready.");
       setLoading(false);
-    }, 3500);
+    }, 12000);
 
     const initAuth = async () => {
+      console.log("[AUTH-INIT]: Starting init sequence...");
       try {
-        if (!auth || typeof setPersistence !== 'function') {
+        if (!auth) {
+           console.error("[AUTH-INIT]: Auth object not found.");
            throw new Error("Firebase Auth service not ready.");
         }
-        await setPersistence(auth, browserLocalPersistence);
         
-        // Handle redirect result for mobile users
-        const result = await getRedirectResult(auth);
+        console.log("[AUTH-INIT]: Setting persistence...");
+        await setPersistence(auth, browserLocalPersistence);
+        console.log("[AUTH-INIT]: Persistence set.");
+        
+        console.log("[AUTH-INIT]: Checking redirect result...");
+        const result = await Promise.race([
+          getRedirectResult(auth),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Redirect check timeout")), 8000))
+        ]).catch(err => {
+          console.warn("[AUTH-INIT]: Skipping redirect result due to error/timeout:", err);
+          return null;
+        }) as any;
+        console.log("[AUTH-INIT]: Redirect result check finished.", result ? "Result found" : "No result");
+        
         if (result) {
           const uid = result.user.uid;
+          console.log("[AUTH-INIT]: Processing redirect for UID:", uid);
           const existingProfile = await fetchProfile(uid);
           if (!existingProfile) {
+            console.log("[AUTH-INIT]: Creating new profile for redirect user...");
             await setDoc(doc(db, "users", uid), {
               uid,
               email: result.user.email,
@@ -165,16 +182,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               isGuest: false,
             });
           }
-          try {
-            document.cookie = `fb-session=1; path=/; max-age=86400; SameSite=Lax`;
-          } catch (e) {
-            console.warn("Cookie fail:", e);
-          }
+          console.log("[AUTH-INIT]: Setting session cookie...");
+          document.cookie = `fb-session=1; path=/; max-age=86400; SameSite=Lax`;
         }
+        console.log("[AUTH-INIT]: Initialization complete.");
         setLoading(false);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        console.error("Auth initialization failed:", msg);
+        console.error("[AUTH-INIT]: FAILED:", msg);
         setInitError(msg);
         setLoading(false);
       } finally {

@@ -24,8 +24,14 @@ function AuthContent() {
   const [debugLog, setDebugLog] = useState<string[]>([]);
 
   const logDebug = (msg: string) => {
-    console.log(`[AUTH-DEBUG]: ${msg}`);
-    setDebugLog(prev => [...prev.slice(-4), msg]);
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const formatted = `${timestamp}: ${msg}`;
+    console.log(`[AUTH-DEBUG]: ${formatted}`);
+    setDebugLog(prev => {
+      const next = [...prev.slice(-9), formatted];
+      try { sessionStorage.setItem('auth_debug_logs', JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   // Sync tab with URL search params
@@ -34,6 +40,14 @@ function AuthContent() {
     if (requestedTab === "login" || requestedTab === "signup") {
       setTab(requestedTab);
     }
+    
+    // Load persisted logs
+    try {
+      const saved = sessionStorage.getItem('auth_debug_logs');
+      if (saved) {
+        setDebugLog(JSON.parse(saved));
+      }
+    } catch {}
   }, [searchParams]);
 
   // Handle automatic redirect if user becomes authenticated (fixes mobile redirect hang)
