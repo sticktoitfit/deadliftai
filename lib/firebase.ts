@@ -38,6 +38,8 @@ try {
   console.log("Firebase: initializing with config", firebaseConfig.projectId);
   app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   auth = getAuth(app);
+  // Set persistence immediately
+  setPersistence(auth, browserLocalPersistence);
   db = getFirestore(app);
   console.log("Firebase: initialized successfully");
 } catch (e) {
