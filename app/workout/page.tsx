@@ -457,11 +457,9 @@ export default function WorkoutPage() {
           <h2 className="text-xs font-black uppercase tracking-[0.6em] text-white/90">
             Peak Performance Matrix
           </h2>
-          <div className="mt-4 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 animate-bounce">
-            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">
-              Tap any gauge to probe stats
-            </p>
-          </div>
+          <p className="text-[7px] font-black uppercase tracking-[0.3em] text-primary mt-2 opacity-50">
+            Real-time Neural Analysis
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 relative z-10 max-w-2xl mx-auto">
@@ -488,15 +486,14 @@ export default function WorkoutPage() {
                 onClick={() => router.push(`/workout/matrix/${lift}`)}
                 className="flex flex-col items-center gap-4 group/gauge cursor-pointer relative"
               >
-                {/* FLOATING AFFORDANCE HINT (only for the first one as a cue) */}
-                {idx === 0 && (
-                  <div className="absolute -top-6 -right-12 z-20 pointer-events-none animate-bounce hidden sm:block">
-                    <div className="bg-primary text-white text-[8px] font-black uppercase px-2 py-1 rounded-md shadow-lg flex items-center gap-1">
-                      <span>Probing Active</span>
-                      <RotateCcw size={8} className="animate-spin-slow" />
-                    </div>
+                {/* FLOATING INTERACTION STICKER (Fixed to the ring) */}
+                <div className="absolute top-0 right-0 z-20 pointer-events-none animate-bounce flex flex-col items-center">
+                  <div className="bg-primary/20 backdrop-blur-md border border-primary/40 text-primary text-[6px] font-black uppercase px-2 py-0.5 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                    Probe Analysis
                   </div>
-                )}
+                  <div className="w-[1px] h-4 bg-gradient-to-b from-primary/40 to-transparent" />
+                </div>
+
                 {/* Self-contained SVG gauge */}
                 <div className="relative w-36 h-36 group-hover/gauge:scale-110 transition-transform duration-500">
                   <svg viewBox="0 0 160 160" className="w-full h-full rotate-[-225deg]">
