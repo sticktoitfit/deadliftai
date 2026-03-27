@@ -52,58 +52,6 @@ function HomeContent() {
 
   return (
     <div className="relative h-[100dvh] w-full flex flex-col items-center justify-center bg-background overflow-hidden selection:bg-primary selection:text-background">
-      {/* HUD Elements - TOP */}
-      <div className="fixed top-0 left-0 right-0 z-50 p-6 md:p-10 flex items-start justify-between opacity-60 pointer-events-none select-none">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--color-primary)]" />
-            <span className="font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] text-primary font-bold">System Online</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-widest text-text-secondary/80">CORE_ENGINE: V16.2.1</span>
-            <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-widest text-text-secondary/60">ENCRYPTION: AES-256</span>
-          </div>
-        </div>
-        <div className="hidden sm:flex flex-col items-end gap-1 font-mono text-[9px] uppercase tracking-widest text-text-secondary/80 text-right">
-          <span className="text-primary/70">LOC: 34.0522° N, 118.2437° W</span>
-          <span className="opacity-50">HEADING: 284° NW</span>
-        </div>
-      </div>
-
-      {/* Decorative Scanning Line */}
-      <div className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent z-40 animate-scan pointer-events-none" />
-
-      {/* HUD Elements - BOTTOM */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-8 md:p-12 flex items-end justify-between opacity-50 pointer-events-none select-none">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-1 w-24 md:w-32 bg-white/5 overflow-hidden rounded-full border border-white/5">
-              <div className="h-full bg-primary animate-progress-loading" />
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-primary animate-pulse">Syncing...</span>
-          </div>
-          <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.4em] text-text-secondary leading-none">Initializing Bio-Feedback Periodization</span>
-        </div>
-        
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex flex-col items-end gap-1">
-            <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-widest text-text-secondary/80">Neural Link Status</span>
-            <div className="flex gap-1.5 h-4 items-end">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div 
-                  key={i} 
-                  className={cn(
-                    "w-1 rounded-full transition-all duration-1000",
-                    i <= 4 ? "bg-primary animate-pulse" : "bg-white/10"
-                  )} 
-                  style={{ height: `${20 + (i * 12)}%`, animationDelay: `${i * 150}ms` }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Hero Background Animation */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-10 opacity-90" />
@@ -115,7 +63,7 @@ function HomeContent() {
         />
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Centered & Non-Scrollable */}
       <div className="relative z-20 flex flex-col items-center justify-center h-full gap-8 text-center animate-in fade-in zoom-in duration-1000 px-6">
         <div className="flex flex-col items-center gap-4">
           <div className="group relative">
@@ -152,6 +100,7 @@ function HomeContent() {
         </div>
       </div>
     </div>
+
 
 
   );
