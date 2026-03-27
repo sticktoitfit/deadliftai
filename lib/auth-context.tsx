@@ -166,7 +166,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, 12000);
 
     const initAuth = async () => {
-      logDebug("Auth initializing...");
+      const hash = window.location.hash ? "present" : "nil";
+      const hasCode = window.location.search.includes("code=") ? " (with result code)" : "";
+      logDebug(`Auth initializing... Hash:${hash}${hasCode}`);
       try {
         if (!auth) {
            throw new Error("SDK Load Failure");
