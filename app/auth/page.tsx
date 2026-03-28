@@ -240,13 +240,6 @@ function AuthContent() {
             {isLoading ? "Communicating..." : "Continue with Google"}
           </button>
           
-            <button 
-              type="button"
-              onClick={() => handleGoogle(undefined, 'redirect')}
-              className="mt-1 text-[10px] text-text-secondary hover:text-white uppercase font-bold tracking-widest transition-colors py-1"
-            >
-              Trouble with popups? Try Redirect Mode
-            </button>
         </div>
 
         {/* Divider */}
