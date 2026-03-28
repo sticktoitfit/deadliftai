@@ -136,42 +136,49 @@ function AuthContent() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center gap-6">
-        <PassiveQuote />
-        <button 
-          onClick={() => forceReady()}
-          className="mt-12 text-[10px] text-primary/20 uppercase font-black hover:text-white transition-colors p-4"
-        >
-          Manual Override
-        </button>
-      </div>
-    );
-  }
+  // Unified UI for all transition states (Handshake, Signing In, and Success Redirect)
+  const isLiminal = loading || !!successRoute || ((!!user && !hasRedirected) || isLoading);
 
-  // Prevent "jumps" or flickers by checking for active transitions or signed-in state
-  if (successRoute) {
+  if (isLiminal) {
     return (
-      <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center animate-in fade-in zoom-in duration-500 text-center gap-6">
-        <div className="p-5 rounded-full bg-primary/10 mb-2 relative">
-          <div className="absolute inset-0 bg-primary-glow blur-xl rounded-full opacity-60 animate-pulse" />
-          <Loader2 size={48} className="text-primary animate-spin relative z-10" />
+      <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center animate-in fade-in duration-700 text-center relative">
+        <div className="w-full transition-all duration-700 transform translate-y-[-20px]">
+          <PassiveQuote />
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-black tracking-tight">{tab === "login" ? "Access Granted" : "Welcome to Deadlift.ai"}</h2>
-          <p className="text-text-secondary text-[10px] font-bold tracking-widest uppercase mt-4 animate-pulse">{successRoute.message}</p>
+        
+        <div className="flex flex-col items-center gap-6 mt-4 min-h-[120px] justify-center">
+          {successRoute ? (
+            <div className="flex flex-col items-center gap-5 animate-in fade-in zoom-in-95 duration-1000">
+              <div className="p-3.5 rounded-full bg-primary/5 relative">
+                <div className="absolute inset-0 bg-primary-glow blur-2xl rounded-full opacity-20 animate-pulse" />
+                <Loader2 size={24} className="text-primary animate-spin relative z-10" />
+              </div>
+              <div className="space-y-1.5 px-6">
+                <h2 className="text-lg font-black tracking-tight text-white uppercase">
+                  {tab === "login" ? "Identity Verified" : "Access Granted"}
+                </h2>
+                <p className="text-text-secondary text-[9px] font-bold tracking-[0.2em] uppercase animate-pulse leading-relaxed">
+                  {successRoute.message}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
+               <p className="text-[10px] text-text-secondary uppercase tracking-[0.4em] font-black animate-pulse opacity-60">
+                 {loading ? "Establishing Handshake..." : "Synchronizing Core..."}
+               </p>
+            </div>
+          )}
         </div>
-      </div>
-    );
-  }
 
-  // If we have a user but no successRoute yet, we're in the middle of a profile fetch/redirect handshake
-  if ((user && !hasRedirected) || isLoading) {
-    return (
-      <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center animate-in fade-in duration-500 gap-8 text-center">
-        <PassiveQuote />
-        <p className="text-[10px] text-text-secondary uppercase tracking-[0.3em] font-black animate-pulse">Initializing Identity...</p>
+        {loading && (
+          <button 
+            onClick={() => forceReady()}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-primary/10 uppercase font-bold hover:text-primary/40 transition-colors py-4 px-8"
+          >
+            Skip Handshake
+          </button>
+        )}
       </div>
     );
   }
