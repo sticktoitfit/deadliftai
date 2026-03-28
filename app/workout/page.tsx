@@ -52,6 +52,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { cn } from "@/lib/utils";
+import ProgrammingTransparency from "@/components/ui/ProgrammingTransparency";
 
 type Lift = "squat" | "bench" | "deadlift";
 
@@ -506,6 +507,14 @@ export default function WorkoutPage() {
           <p className="text-[7px] font-black uppercase tracking-[0.3em] text-primary mt-2 opacity-50">
             Real-time Neural Analysis
           </p>
+          
+          {/* Scientific Transparency Layer */}
+          <ProgrammingTransparency 
+            recoveryProfile={userProfile?.onboardingData?.recoveryProfile}
+            age={parseInt(userProfile?.onboardingData?.age || "25")}
+            frequency={targetFrequency}
+            className="mt-6 max-w-sm w-full mx-auto"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 relative z-10 max-w-2xl mx-auto">

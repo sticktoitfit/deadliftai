@@ -175,6 +175,7 @@ export function prescribeNextSession(
   overrides?: {
     accessoryPoolUsed?: string[];
     intensityRipple?: number;
+    frequency?: number;
   }
 ): SessionPrescription {
   const isFemale = userMetadata?.recoveryProfile === "female";
@@ -206,7 +207,19 @@ export function prescribeNextSession(
   const backoffWeight = Math.round((primaryWeight * 0.90) / 2.5) * 2.5;
 
   const movements: MovementPrescription[] = [];
-  const backoffSetCount = isMasters ? 2 : (isFemale ? 4 : 3);
+  
+  // SCIENTIFIC VOLUME SCALING
+  // Optimal weekly sets for strength: ~10-15 per muscle group.
+  // 1. Base Sets
+  let baseSets = 3; 
+  // 2. Frequency Offset: 3-day plans need more work per session to hit minimal effective volume.
+  if ((overrides?.frequency || 4) <= 3) baseSets += 1;
+  // 3. Biological Recovery: Estrogen-dominant profiles typically tolerate and require more volume.
+  if (isFemale) baseSets += 1;
+  // 4. Age Cap: Masters lifters (40+) prioritize joint recovery over total stress.
+  if (isMasters) baseSets -= 1;
+
+  const backoffSetCount = Math.max(2, baseSets);
 
   // Advanced Tech: Tempo training for Accumulation
   const noteSuffix = phase === "accumulation" && currentWeek % 2 === 0 ? " [Add 3-0-3-0 Tempo for technical refinement]" : "";
@@ -337,7 +350,8 @@ export function prescribeFullWeek(
       weakPoint: wp
     }, {
       accessoryPoolUsed: weekState.usedAccessories,
-      intensityRipple: weekState.ripples[rippleIdx]
+      intensityRipple: weekState.ripples[rippleIdx],
+      frequency: targetFrequency
     });
     
     // Add these accessories to used set
