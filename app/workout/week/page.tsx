@@ -56,7 +56,13 @@ export default function WeeklyHubPage() {
       },
       recentLogs as any,
       week,
-      weeksTotal
+      weeksTotal,
+      parseInt(od.frequency) || 4,
+      {
+        recoveryProfile: od.recoveryProfile,
+        age: parseInt(od.age || "25"),
+        weakPoints: od.weakPoints
+      }
     );
 
     setWeeklyPlan(plan);

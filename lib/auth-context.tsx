@@ -43,6 +43,13 @@ export interface UserProfile {
     meetDate?: string;
     frequency: string;
     goalType?: "meet" | "block";
+    recoveryProfile?: "male" | "female"; // Defines the physiological response (estrogen-dominant vs testosterone-dominant)
+    age?: string;
+    weakPoints?: {
+      squat?: string;
+      bench?: string;
+      deadlift?: string;
+    };
   };
   preferences?: {
     showQuotes: boolean;

@@ -20,7 +20,8 @@ import {
   ArrowUp,
   RotateCcw,
   LogOut,
-  Maximize2
+  Maximize2,
+  Activity
 } from "lucide-react";
 import BrandLogo from "@/components/ui/BrandLogo";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,6 +34,7 @@ import {
   getTrainingPhase,
   analyzeScheduleCompliance,
   calculateProgramTiming,
+  analyzeNeuromuscularTrends,
   type SessionPrescription,
   type WorkoutLog,
 } from "@/lib/programming/periodization";
@@ -79,6 +81,8 @@ export default function WorkoutPage() {
   const [targetFrequency, setTargetFrequency] = useState(4);
   const [phase, setPhase] = useState<string>("accumulation");
   const [pageLoading, setPageLoading] = useState(true);
+  const [trendMessage, setTrendMessage] = useState<string | null>(null);
+  const [neuralStatus, setNeuralStatus] = useState<string>("stable");
 
   const todayStr = new Date().toLocaleDateString("en-US", { 
     weekday: 'long', 
@@ -145,6 +149,12 @@ export default function WorkoutPage() {
         return log.completed && logTime >= currentWeekStart;
       }).length;
       setWeeklySessions(completedThisWeek);
+
+      const trend = analyzeNeuromuscularTrends(recentLogs);
+      if (trend) {
+        setTrendMessage(trend.message);
+        setNeuralStatus(trend.status);
+      }
     } catch (e) {}
 
     // Build the full 4-session plan
@@ -157,7 +167,12 @@ export default function WorkoutPage() {
       recentLogs,
       week,
       weeks,
-      freq
+      freq,
+      {
+        recoveryProfile: od.recoveryProfile,
+        age: parseInt(od.age || "25"),
+        weakPoints: od.weakPoints
+      }
     );
     setFullWeekPlan(weekPlan);
 
@@ -258,11 +273,23 @@ export default function WorkoutPage() {
           <h1 className="text-3xl font-black tracking-tight leading-none mb-3">
             Training Session <span className="text-primary">{weeklySessions + 1}</span> <span className="text-white/20">/</span> {targetFrequency}
           </h1>
-          <div className="flex items-center gap-3">
-             <div className={cn("text-[9px] font-black px-3 py-1.5 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10", phaseInfo.color)}>
+          <div className="flex flex-wrap items-center gap-3">
+             <div className={cn("text-[8px] sm:text-[9px] font-black px-3 py-1.5 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10", phaseInfo.color)}>
                {phaseInfo.label}
              </div>
-             <p className="text-text-secondary text-[10px] font-black tracking-widest uppercase">
+             
+             {trendMessage && (
+               <div className={cn(
+                 "text-[8px] sm:text-[9px] font-black px-3 py-1.5 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10 flex items-center gap-2",
+                 neuralStatus === "fatigued" ? "text-red-400 border-red-500/20" : 
+                 neuralStatus === "primed" ? "text-green-400 border-green-500/20" : "text-primary border-primary/20"
+               )}>
+                 <Activity size={10} className={cn(neuralStatus === "fatigued" ? "animate-pulse" : "")} />
+                 {neuralStatus === "fatigued" ? "NEURAL SLIPPAGE" : neuralStatus === "primed" ? "MATRIX PRIMED" : "NEURAL SYNC"}
+               </div>
+             )}
+
+             <p className="text-text-secondary text-[9px] sm:text-[10px] font-black tracking-widest uppercase">
                {userProfile?.onboardingData?.goalType === "meet" 
                  ? `${totalWeeks - currentWeek} Weeks to Competition` 
                  : `Week ${currentWeek} of ${totalWeeks}`}

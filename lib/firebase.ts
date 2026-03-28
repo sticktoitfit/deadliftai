@@ -15,6 +15,7 @@ import {
   type UserCredential,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -34,6 +35,7 @@ if (typeof window !== "undefined") {
 let app: any;
 let auth: any;
 let db: any;
+let storage: any;
 try {
   console.log("Firebase: initializing with config", firebaseConfig.projectId);
   app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
@@ -41,6 +43,7 @@ try {
   // Set persistence immediately
   setPersistence(auth, browserLocalPersistence);
   db = getFirestore(app);
+  storage = getStorage(app);
   console.log("Firebase: initialized successfully");
 } catch (e) {
   console.error("Firebase Initialization CRASHED:", e);
@@ -48,6 +51,7 @@ try {
   app = {} as any;
   auth = null as any; 
   db = {} as any;
+  storage = {} as any;
   // Track that Firebase failed to load
   if (typeof window !== "undefined") {
     (window as any).FIREBASE_LOAD_RETRY = true;
@@ -64,6 +68,7 @@ export {
   app,
   auth,
   db,
+  storage,
   googleProvider,
   signInWithPopup,
   signInWithRedirect,
@@ -77,3 +82,4 @@ export {
   type User,
   type UserCredential,
 };
+

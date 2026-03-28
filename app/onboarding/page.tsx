@@ -15,6 +15,13 @@ interface OnboardingData {
   meetDate: string;
   frequency: string;
   goalType: "meet" | "block";
+  recoveryProfile: "male" | "female";
+  age: string;
+  weakPoints: {
+    squat: string;
+    bench: string;
+    deadlift: string;
+  };
 }
 
 export default function Onboarding() {
@@ -32,6 +39,13 @@ export default function Onboarding() {
     meetDate: "",
     frequency: "4",
     goalType: "block",
+    recoveryProfile: "male",
+    age: "25",
+    weakPoints: {
+      squat: "Hole",
+      bench: "Bottom",
+      deadlift: "Floor",
+    },
   });
 
   useEffect(() => {
@@ -61,7 +75,7 @@ export default function Onboarding() {
   };
 
   const handleNext = async () => {
-    if (step < 3) {
+    if (step < 5) {
       setStep((s) => s + 1);
       return;
     }
@@ -135,7 +149,7 @@ export default function Onboarding() {
         ) : <div className="w-10" />}
         
         <div className="flex gap-2">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3, 4, 5].map(i => (
             <div 
               key={i} 
               className={`h-2 rounded-full transition-all duration-300 ${
@@ -159,15 +173,15 @@ export default function Onboarding() {
               </p>
             </div>
             
-            {["squat", "bench", "deadlift"].map((lift) => (
+            {(["squat", "bench", "deadlift"] as const).map((lift) => (
               <div key={lift} className="space-y-2">
-                <label className="text-sm font-bold uppercase tracking-wider text-text-secondary pl-1">
+                <label className="text-sm font-bold uppercase tracking-wider text-text-secondary pl-1 capitalize">
                   {lift} (lbs)
                 </label>
                 <input
                   type="number"
                   placeholder="0"
-                  value={data[lift as keyof OnboardingData]}
+                  value={data[lift] as string}
                   onChange={(e) => updateData({ [lift]: e.target.value })}
                   className="w-full bg-surface hover:bg-surface-hover border border-white/5 rounded-xl px-5 py-4 text-xl font-mono text-white placeholder-white/20 focus:outline-none focus:border-primary transition-colors duration-300"
                 />
@@ -177,6 +191,59 @@ export default function Onboarding() {
         )}
 
         {step === 2 && (
+          <div className="space-y-6 animate-in slide-in-from-right-4">
+            <div className="mb-8">
+              <h2 className="text-3xl font-black flex items-center gap-3">
+                <Activity className="text-primary" /> Physiological Profile
+              </h2>
+              <p className="text-text-secondary mt-2 text-sm leading-relaxed">
+                Choose the profile that matches your current hormonal state. This adjusts recovery volume and intensity multipliers based on fatigability research.
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex bg-surface p-1 rounded-2xl border border-white/5">
+                <button
+                  onClick={() => updateData({ recoveryProfile: "male" })}
+                  className={`flex-1 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all ${
+                    data.recoveryProfile === "male" ? "bg-white/10 text-white" : "text-text-secondary hover:text-white/60"
+                  }`}
+                >
+                  Testosterone Dominant
+                </button>
+                <button
+                  onClick={() => updateData({ recoveryProfile: "female" })}
+                  className={`flex-1 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all ${
+                    data.recoveryProfile === "female" ? "bg-white/10 text-white" : "text-text-secondary hover:text-white/60"
+                  }`}
+                >
+                  Estrogen Dominant
+                </button>
+              </div>
+              
+              <p className="text-[10px] text-text-secondary italic px-2 leading-relaxed">
+                * Trans lifters on HRT should select the profile that aligns with their current hormonal replacement status for optimal predictive accuracy.
+              </p>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold uppercase tracking-wider text-text-secondary pl-1">
+                  Age
+                </label>
+                <input
+                  type="number"
+                  value={data.age}
+                  onChange={(e) => updateData({ age: e.target.value })}
+                  className="w-full bg-surface hover:bg-surface-hover border border-white/5 rounded-xl px-5 py-4 text-xl font-mono text-white placeholder-white/20 focus:outline-none focus:border-primary transition-colors duration-300"
+                />
+                <p className="text-[10px] text-text-secondary italic pl-1">
+                  Masters athletes (40+) receive joint-protective volume scaling.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
           <div className="space-y-6 animate-in slide-in-from-right-4">
             <div className="mb-8">
               <h2 className="text-3xl font-black flex items-center gap-3">
@@ -234,15 +301,54 @@ export default function Onboarding() {
                   onChange={(e) => updateData({ meetDate: e.target.value })}
                   className="w-full bg-surface hover:bg-surface-hover border border-white/5 rounded-xl px-5 py-4 text-xl font-mono text-white placeholder-white/20 focus:outline-none focus:border-primary transition-colors duration-300 [color-scheme:dark]"
                 />
-                <p className="text-[10px] text-text-secondary italic pl-1">
-                  The AI will intelligently divide the time between today and your meet date into optimal Accumulation, Transmutation, and Peaking blocks.
-                </p>
               </div>
             )}
           </div>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
+          <div className="space-y-6 animate-in slide-in-from-right-4">
+            <div className="mb-8">
+              <h2 className="text-3xl font-black flex items-center gap-3">
+                <Activity className="text-primary" /> Technique Analysis
+              </h2>
+              <p className="text-text-secondary mt-2 text-sm leading-relaxed">
+                Where do you fail your lifts? This allows the AI to select variants (like Pause Squats vs. Deficits) specific to your weak points.
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              {[
+                { lift: "squat", options: ["Hole", "Mid-way", "Lockout", "Good Morning"] },
+                { lift: "bench", options: ["Bottom", "Mid-way", "Lockout"] },
+                { lift: "deadlift", options: ["Floor", "Bellow Knee", "Lockout"] }
+              ].map((group) => (
+                <div key={group.lift} className="space-y-2">
+                  <label className="text-sm font-bold uppercase tracking-wider text-text-secondary pl-1 capitalize">
+                    {group.lift} Sticking Point
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {group.options.map(opt => (
+                      <button
+                        key={opt}
+                        onClick={() => updateData({ weakPoints: { ...data.weakPoints, [group.lift]: opt } })}
+                        className={`px-4 py-2 rounded-lg border text-xs font-bold transition-all ${
+                          data.weakPoints[group.lift as keyof OnboardingData["weakPoints"]] === opt
+                            ? "bg-primary border-primary text-black"
+                            : "bg-surface border-white/5 text-text-secondary hover:text-white"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 5 && (
           <div className="space-y-6 animate-in slide-in-from-right-4">
             <div className="mb-8">
               <h2 className="text-3xl font-black flex items-center gap-3">

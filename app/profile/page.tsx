@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import type { WorkoutLog } from "@/lib/programming/periodization";
 import { cn } from "@/lib/utils";
+import { ProgrammingTransparency } from "@/components/ui/ProgrammingTransparency";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STREAK LOGIC
@@ -250,6 +251,15 @@ export default function ProfilePage() {
             {(totalVolume / 2000).toFixed(2)} <span className="text-sm text-text-secondary font-sans font-medium mb-1 tracking-normal uppercase">Tons Moved</span>
           </p>
         </div>
+      </div>
+
+      {/* Programming AI Transparency Section */}
+      <div className="mt-12">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-text-secondary flex items-center gap-2 mb-6">
+          <Activity size={16} />
+          Training Architecture
+        </h2>
+        <ProgrammingTransparency />
       </div>
 
       {/* Preferences Section (The "Kill Switch") */}

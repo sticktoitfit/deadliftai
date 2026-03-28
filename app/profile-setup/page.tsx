@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { User, CheckCircle, XCircle, Loader2, ArrowRight, ChevronLeft } from "lucide-react";
+import { User, CheckCircle, XCircle, Loader2, ArrowRight, ChevronLeft, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AvatarGrid, AVATARS } from "@/components/ui/AvatarGrid";
 import { db } from "@/lib/firebase";
@@ -22,6 +22,7 @@ export default function ProfileSetupPage() {
   const [username, setUsername] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle");
   const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0].id);
+  const [uploadedPhotoURL, setUploadedPhotoURL] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successRoute, setSuccessRoute] = useState<{ url: string, message: string } | null>(null);
@@ -41,8 +42,8 @@ export default function ProfileSetupPage() {
 
   // Pre-select Google photo if available
   useEffect(() => {
-    if (user?.photoURL) setSelectedAvatar("google-photo");
-  }, [user?.photoURL]);
+    if (user?.photoURL && !uploadedPhotoURL) setSelectedAvatar("google-photo");
+  }, [user?.photoURL, uploadedPhotoURL]);
 
   /** Debounced username availability check against Firestore */
   const handleUsernameChange = (value: string) => {
@@ -85,6 +86,14 @@ export default function ProfileSetupPage() {
     setIsSaving(true);
     setError(null);
     try {
+      // Determine the final photoURL based on selection
+      let finalPhotoURL = null;
+      if (selectedAvatar === "uploaded-photo") {
+        finalPhotoURL = uploadedPhotoURL;
+      } else if (selectedAvatar === "google-photo") {
+        finalPhotoURL = user.photoURL;
+      }
+
       await setDoc(
         doc(db, "users", user.uid),
         {
@@ -92,7 +101,7 @@ export default function ProfileSetupPage() {
           email: user.email,
           username: username.trim().toLowerCase(),
           avatarId: selectedAvatar,
-          photoURL: user.photoURL ?? null,
+          photoURL: finalPhotoURL,
           updatedAt: serverTimestamp(),
         },
         { merge: true }
@@ -110,6 +119,19 @@ export default function ProfileSetupPage() {
       setIsSaving(false);
     }
   };
+
+  const handleUploadComplete = (url: string) => {
+    setUploadedPhotoURL(url);
+    setSelectedAvatar("uploaded-photo");
+  };
+
+  const handleRemovePhoto = () => {
+    setUploadedPhotoURL(null);
+    if (selectedAvatar === "uploaded-photo") {
+      setSelectedAvatar(user?.photoURL ? "google-photo" : AVATARS[0].id);
+    }
+  };
+
 
   const usernameStatusIcon = () => {
     switch (usernameStatus) {
@@ -196,17 +218,24 @@ export default function ProfileSetupPage() {
           <p className="text-xs pl-1">{usernameHelperText()}</p>
         </div>
 
-        {/* Avatar Picker */}
-        <div className="space-y-3">
+        {/* Avatar Selection */}
+        <div className="space-y-4">
           <label className="text-xs font-bold uppercase tracking-widest text-text-secondary">
-            Choose Your Avatar
+            Identify Yourself
           </label>
+          <p className="text-[10px] text-text-secondary uppercase tracking-widest font-bold">
+            Upload a photo, use your Google profile, or pick an emoji:
+          </p>
           <AvatarGrid
+            userId={user?.uid ?? "guest"}
             selected={selectedAvatar}
             onSelect={setSelectedAvatar}
+            onUploadComplete={handleUploadComplete}
             googlePhotoURL={user?.photoURL ?? null}
+            uploadedPhotoURL={uploadedPhotoURL}
           />
         </div>
+
 
         {/* Error */}
         {error && (

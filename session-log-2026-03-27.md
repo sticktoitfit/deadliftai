@@ -14,3 +14,40 @@ Enhanced the "Peak Performance Matrix" in the workout dashboard to improve click
 
 ## Next Steps
 - Verify visual consistency across different screen sizes.
+
+## Session Log - 2026-03-27 (Athlete Tester Mission)
+
+### Summary
+Started a full-scale simulation of the athlete journey to test the application's flow and logic.
+
+### Tasks Completed
+- [x] Initialized Athlete Tester Mission.
+- [x] Defined Implementation Plan and Task List.
+- [x] Completed full athlete simulation from signup to workout completion.
+
+### Bugs / Fixes
+- [FIX] PR Celebration modal now auto-dismisses correctly (stabilized `useCallback`).
+- [FIX] Resolved "Rules of Hooks" error in `ActiveWorkoutContent`.
+- [UI] Flow Mode layout optimized for mobile viewports (reduced vertical density).
+- [UI] "Continue to Onboarding" button on profile setup fails to register clicks consistently (potentially disabled state logic issues).
+- [UX] RPE button interaction starts rest timer automatically without explicit confirmation.
+
+### Next Steps
+- Final review of "Onboarding Continue" button interaction logic.
+- Consider adding an explicit "Save Set" or "Done" button option for lifters who prefer it.
+- Verify visual consistency on ultra-wide vs mobile viewports.
+
+## Session Log - 2026-03-27 (Avatar Upload Integration)
+
+### Summary
+Optimized the profile setup experience by merging the image upload functionality directly into the avatar selection grid.
+
+### Tasks Completed
+- [x] **AvatarGrid Refactor**: Integrated Firebase Storage upload logic and progress tracking into the grid component.
+- [x] **Integrated UI**: Replaced the separate upload section with a sleek, cohesive "Upload" tile in the selection grid.
+- [x] **State Management**: Ensured uploaded and Google profile photos are treated as primary options with automatic selection upon upload.
+- [x] **Visual Verification**: Confirmed the new layout on `localhost:3002`, ensuring a balanced and premium aesthetic.
+
+### Next Steps
+- Optional: Add client-side image cropping for better avatar alignment.
+- Optional: Cleanup obsolete `ProfilePictureUpload.tsx` component.

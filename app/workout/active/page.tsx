@@ -263,6 +263,8 @@ function ActiveWorkoutContent() {
     }
   }
 
+  const handlePRComplete = useCallback(() => setCelebratingPR(null), []);
+
   if (sessionDone) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[85vh] gap-8 text-center animate-in fade-in zoom-in duration-700">
@@ -299,7 +301,7 @@ function ActiveWorkoutContent() {
           liftName={celebratingPR.name}
           weight={celebratingPR.weight}
           reps={celebratingPR.reps}
-          onComplete={() => setCelebratingPR(null)}
+          onComplete={handlePRComplete}
         />
       )}
       
@@ -410,78 +412,78 @@ function ActiveWorkoutContent() {
       </div>
 
       {/* Progression Breadcrumb */}
-      <div className="pt-2 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <div className="pt-1 flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
         <div className="flex-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary mb-3 opacity-60 flex items-center gap-2">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-text-secondary mb-2 opacity-60 flex items-center gap-2">
             <span>{todayStr}</span>
             <span className="text-white/20 font-bold">•</span>
             <span className="text-primary font-bold uppercase">Session {weeklySessions + 1} / {targetFrequency} Flow</span>
           </p>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             {movements.map((m, idx) => (
-              <div key={idx} className="flex items-center gap-2">
+              <div key={idx} className="flex items-center gap-1.5">
                  <div className={cn(
-                   "px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all duration-500",
-                   idx === currentMovementIndex ? "bg-primary border-primary text-white shadow-[0_0_25px_rgba(59,130,246,0.3)] scale-105" :
+                   "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-500",
+                   idx === currentMovementIndex ? "bg-primary border-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.25)] scale-105" :
                    idx < currentMovementIndex ? "bg-white/5 border-white/20 text-white/20" :
                    "bg-surface border-white/5 text-text-secondary opacity-40"
                  )}>
                     {m.name}
                  </div>
-                 {idx < movements.length - 1 && <span className="text-white/10 font-bold text-xs select-none">/</span>}
+                 {idx < movements.length - 1 && <span className="text-white/10 font-bold text-[10px] select-none">/</span>}
               </div>
             ))}
           </div>
         </div>
         <button 
           onClick={() => setShowFullWorkout(true)}
-          className="shrink-0 w-12 h-12 rounded-2xl bg-surface border border-white/10 text-text-secondary hover:text-white hover:border-primary/40 hover:bg-surface-hover transition-all duration-300 flex items-center justify-center group shadow-2xl shadow-black/40"
+          className="shrink-0 w-10 h-10 rounded-xl bg-surface border border-white/10 text-text-secondary hover:text-white hover:border-primary/40 transition-all duration-300 flex items-center justify-center group shadow-2xl shadow-black/40"
           title="View Full Session"
         >
-          <List size={22} className="group-hover:scale-110 transition-transform" />
+          <List size={20} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
 
       {/* Primary Display */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-2 py-4 relative text-center">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 blur-[80px] -z-10" />
+      <div className="flex-1 flex flex-col items-center justify-center gap-1 py-2 relative text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/5 blur-[80px] -z-10" />
         
         {/* Movement Detail */}
-        <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
-          <p className="text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-3 opacity-60">Executing</p>
-          <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-white leading-tight uppercase max-w-sm mx-auto">
+        <div className="mb-4 animate-in fade-in slide-in-from-top-4 duration-700">
+          <p className="text-primary text-[9px] font-black uppercase tracking-[0.4em] mb-2 opacity-60">Executing</p>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white leading-tight uppercase max-w-sm mx-auto">
             {currentMovement.name}
           </h2>
-          <div className="flex items-center justify-center gap-3 mt-4">
-             <div className="h-[1px] w-8 bg-white/10" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary">
+          <div className="flex items-center justify-center gap-2 mt-2">
+             <div className="h-[1px] w-6 bg-white/10" />
+             <p className="text-[9px] font-black uppercase tracking-widest text-text-secondary">
                Set {currentSetIndex + 1} of {currentMovement.sets.length}
              </p>
-             <div className="h-[1px] w-8 bg-white/10" />
+             <div className="h-[1px] w-6 bg-white/10" />
           </div>
         </div>
 
-        <p className="text-text-secondary text-[10px] uppercase font-black tracking-widest mb-1">{currentSetData.label}</p>
+        <p className="text-text-secondary text-[9px] uppercase font-black tracking-widest mb-1">{currentSetData.label}</p>
         
         <div className="text-center group">
           <span className={cn(
             "font-black font-mono text-white leading-none transition-transform duration-500 hover:scale-105 inline-block",
-            currentSetData.weight > 0 ? "text-8xl md:text-9xl" : "text-8xl italic text-primary"
+            currentSetData.weight > 0 ? "text-7xl md:text-8xl" : "text-7xl italic text-primary"
           )}>
             {currentSetData.weight > 0 ? currentSetData.weight : "RPE"}
           </span>
-          {currentSetData.weight > 0 && <span className="text-2xl text-text-secondary font-black ml-3 uppercase">lbs</span>}
+          {currentSetData.weight > 0 && <span className="text-xl text-text-secondary font-black ml-2 uppercase">lbs</span>}
         </div>
         
-        <p className="text-3xl font-black text-text-secondary mt-6">
+        <p className="text-2xl font-black text-text-secondary mt-4">
           Perform <span className="text-white">{currentSetData.reps}</span> reps
         </p>
 
         {/* Intensity Marker */}
-        <div className="mt-8 flex items-center gap-3">
-           <div className="h-[1px] w-8 bg-white/10" />
-           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Target RPE {currentSetData.rpeTarget}</p>
-           <div className="h-[1px] w-8 bg-white/10" />
+        <div className="mt-4 flex items-center gap-3">
+           <div className="h-[1px] w-6 bg-white/10" />
+           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary">Target RPE {currentSetData.rpeTarget}</p>
+           <div className="h-[1px] w-6 bg-white/10" />
         </div>
 
         {/* Set Nav dots */}
@@ -500,88 +502,88 @@ function ActiveWorkoutContent() {
       </div>
 
       {/* Interaction Layer */}
-      <div className="min-h-[180px] flex flex-col justify-end">
+      <div className="min-h-[140px] flex flex-col justify-end">
         {isResting ? (
-          <div className="text-center pb-8 animate-in slide-in-from-bottom-6 duration-500">
-            <p className="text-[9px] text-text-secondary uppercase font-black tracking-widest mb-4">Inter-Set Recovery</p>
-            <div className="text-6xl font-black font-mono text-primary tabular-nums tracking-tighter">
+          <div className="text-center pb-4 animate-in slide-in-from-bottom-6 duration-500">
+            <p className="text-[9px] text-text-secondary uppercase font-black tracking-widest mb-2">Inter-Set Recovery</p>
+            <div className="text-5xl font-black font-mono text-primary tabular-nums tracking-tighter">
               {formatTime(restTimer)}
             </div>
-          <div className="h-0.5 w-12 bg-green-500/20 mx-auto rounded-full mb-8" />
+          <div className="h-0.5 w-10 bg-green-500/20 mx-auto rounded-full mb-4" />
           
-          <PassiveQuote className="mb-12" />
+          <PassiveQuote className="mb-6 scale-90" />
 
-            <div className="flex justify-center gap-4 mt-8">
+            <div className="flex justify-center gap-3 mt-4">
               <button
                 onClick={() => setTimerPaused((p) => !p)}
-                className="w-14 h-14 rounded-2xl bg-surface border border-white/10 flex items-center justify-center text-text-secondary hover:text-white transition-all active:scale-95"
+                className="w-12 h-12 rounded-xl bg-surface border border-white/10 flex items-center justify-center text-text-secondary hover:text-white transition-all active:scale-95"
               >
-                {timerPaused ? <Play size={24} fill="currentColor" /> : <Pause size={24} fill="currentColor" />}
+                {timerPaused ? <Play size={20} fill="currentColor" /> : <Pause size={20} fill="currentColor" />}
               </button>
               <button
                 onClick={() => { setIsResting(false); setShowRPE(true); }}
-                className="px-8 h-14 rounded-2xl bg-surface border border-white/10 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-text-secondary hover:text-white transition-all active:scale-95"
+                className="px-6 h-12 rounded-xl bg-surface border border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-white transition-all active:scale-95"
               >
-                <SkipForward size={18} /> Skip Rest
+                <SkipForward size={16} /> Skip Rest
               </button>
             </div>
           </div>
         ) : showRPE ? (
-          <div className="pb-8 animate-in slide-in-from-bottom-6 duration-500">
+          <div className="pb-4 animate-in slide-in-from-bottom-6 duration-500">
             {/* Performance Adjustment */}
-            <div className="flex items-center justify-around mb-8 px-2">
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-[9px] font-black uppercase tracking-widest text-text-secondary">Actual Reps</p>
-                <div className="flex items-center gap-4">
+            <div className="flex items-center justify-around mb-6 px-1">
+              <div className="flex flex-col items-center gap-1.5">
+                <p className="text-[8px] font-black uppercase tracking-widest text-text-secondary">Actual Reps</p>
+                <div className="flex items-center gap-3">
                   <button 
                     onClick={() => updateLoggedPerformance('reps', -1)}
-                    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
+                    className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
                   >
-                    <Minus size={16} />
+                    <Minus size={14} />
                   </button>
-                  <span className="text-2xl font-black font-mono w-8 text-center">{currentSetLogs[currentSetIndex].reps}</span>
+                  <span className="text-xl font-black font-mono w-6 text-center">{currentSetLogs[currentSetIndex].reps}</span>
                   <button 
                     onClick={() => updateLoggedPerformance('reps', 1)}
-                    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
+                    className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
                   >
-                    <Plus size={16} />
+                    <Plus size={14} />
                   </button>
                 </div>
               </div>
 
-              <div className="h-12 w-[1px] bg-white/5" />
+              <div className="h-10 w-[1px] bg-white/5" />
 
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-[9px] font-black uppercase tracking-widest text-text-secondary">Actual weight</p>
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col items-center gap-1.5">
+                <p className="text-[8px] font-black uppercase tracking-widest text-text-secondary">Actual weight</p>
+                <div className="flex items-center gap-3">
                   <button 
                     onClick={() => updateLoggedPerformance('weight', -5)}
-                    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
+                    className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
                   >
-                    <Minus size={16} />
+                    <Minus size={14} />
                   </button>
                   <div className="flex flex-col items-center">
-                    <span className="text-2xl font-black font-mono min-w-[3rem] text-center leading-none">{currentSetLogs[currentSetIndex].weight}</span>
-                    <span className="text-[8px] font-bold text-text-secondary uppercase mt-1">lbs</span>
+                    <span className="text-xl font-black font-mono min-w-[2.5rem] text-center leading-none">{currentSetLogs[currentSetIndex].weight}</span>
+                    <span className="text-[7px] font-bold text-text-secondary uppercase mt-0.5">lbs</span>
                   </div>
                   <button 
                     onClick={() => updateLoggedPerformance('weight', 5)}
-                    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
+                    className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-secondary hover:text-white"
                   >
-                    <Plus size={16} />
+                    <Plus size={14} />
                   </button>
                 </div>
               </div>
             </div>
 
-            <p className="text-center text-[10px] font-black uppercase tracking-widest text-text-secondary mb-5">Rate your effort (RPE)</p>
-            <div className="grid grid-cols-5 gap-3 mb-6">
+            <p className="text-center text-[9px] font-black uppercase tracking-widest text-text-secondary mb-4">Rate Effort (RPE)</p>
+            <div className="grid grid-cols-5 gap-2.5 mb-4">
               {[6, 7, 8, 9, 10].map((rpe) => (
                 <button
                   key={rpe}
                   onClick={() => completeSet(rpe)}
                   className={cn(
-                    "h-16 rounded-2xl font-black text-xl transition-all duration-300 active:scale-90",
+                    "h-14 rounded-xl font-black text-lg transition-all duration-300 active:scale-90",
                     rpe >= 9 ? "bg-orange-500/10 border border-orange-500/30 text-orange-400" :
                     rpe >= 8 ? "bg-accent/10 border border-accent/30 text-accent" :
                     "bg-surface border border-white/10 text-white hover:bg-surface-hover"
@@ -593,24 +595,24 @@ function ActiveWorkoutContent() {
             </div>
             <button
               onClick={() => setShowRPE(false)}
-              className="w-full text-[10px] font-black uppercase tracking-widest text-text-secondary py-2 hover:text-white transition-colors"
+              className="w-full text-[9px] font-black uppercase tracking-widest text-text-secondary py-1 hover:text-white transition-colors"
             >
               Cancel
             </button>
           </div>
         ) : (
-          <div className="pb-8 animate-in slide-in-from-bottom-6 duration-500">
+          <div className="pb-4 animate-in slide-in-from-bottom-6 duration-500">
             <button
               onClick={() => setShowRPE(true)}
-              className="btn-primary h-16 text-sm font-black tracking-widest uppercase transition-all duration-300"
+              className="btn-primary h-14 text-xs font-black tracking-widest uppercase transition-all duration-300 shadow-[0_0_30px_rgba(59,130,246,0.15)]"
             >
               Log Set {currentSetIndex + 1}
             </button>
             <button
               onClick={() => router.back()}
-              className="w-full text-[10px] font-black uppercase tracking-widest text-text-secondary py-4 hover:text-white transition-colors flex items-center justify-center gap-1.5"
+              className="w-full text-[9px] font-black uppercase tracking-widest text-text-secondary py-3 hover:text-white transition-colors flex items-center justify-center gap-1.5"
             >
-              <ChevronDown size={14} /> End Session Early
+              <ChevronDown size={12} /> End Session Early
             </button>
           </div>
         )}
