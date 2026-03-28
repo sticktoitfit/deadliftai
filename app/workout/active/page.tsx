@@ -511,7 +511,15 @@ function ActiveWorkoutContent() {
             </div>
           <div className="h-0.5 w-10 bg-green-500/20 mx-auto rounded-full mb-4" />
           
-          <PassiveQuote className="mb-6 scale-90" />
+          {currentMovement.activeRecovery ? (
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mx-4 mb-6 relative overflow-hidden group">
+               <div className="absolute top-0 left-1/4 w-32 h-32 bg-primary/20 blur-[50px] -z-10 animate-pulse" />
+               <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-1 shadow-[0_0_10px_rgba(59,130,246,0.2)]">Active Recovery / Prep</p>
+               <p className="text-white text-sm font-bold">{currentMovement.activeRecovery}</p>
+            </div>
+          ) : (
+            <PassiveQuote className="mb-6 scale-90" />
+          )}
 
             <div className="flex justify-center gap-3 mt-4">
               <button

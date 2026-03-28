@@ -111,6 +111,7 @@ export interface MovementPrescription {
   }[];
   note?: string;
   alternatives?: string[]; // Closest equivalents
+  activeRecovery?: string; // Movement to perform during rest
 }
 
 export interface SessionPrescription {
@@ -157,6 +158,15 @@ const GPP_POOL = {
 };
 
 /**
+ * Accessor for Active Recovery / Mobility exercises to be done during main lift rest.
+ */
+const ACTIVE_RECOVERY = {
+  squat: "90/90 Hips or Dead Bugs",
+  bench: "Band Pull-aparts or Scap Retractions",
+  deadlift: "Cat-Cow or Bird Dogs"
+};
+
+/**
  * WHY: This logic implements an "AI-First" approach (Non-linear waves + Diversity Tracking).
  * It ensures no session in a week is the same, preventing the "3 days of facepulls" problem.
  */
@@ -176,6 +186,7 @@ export function prescribeNextSession(
     accessoryPoolUsed?: string[];
     intensityRipple?: number;
     frequency?: number;
+    sleepQuality?: number;
   }
 ): SessionPrescription {
   const isFemale = userMetadata?.recoveryProfile === "female";
@@ -186,25 +197,67 @@ export function prescribeNextSession(
   // 1. PRIMARY LIFT - MAIN MOVEMENT
   // AI Variation: Intra-week intensity ripple (+/- 2%) simulates a non-linear stimuli
   let intensityPct = ((minPct + maxPct) / 2) + (overrides?.intensityRipple || 0);
+  let backoffMultiplier = 0.90; // Default back-off is 90% of top set
+  let autoregulationNote = "";
   
   if (isFemale) intensityPct += 0.02; 
 
-  // Fitness-Fatigue adjustment
+  // LEAPTER AI AGENT: SESSION ADJUSTMENT LOGIC (from TrainingProgramLogic.md)
+  const lastLog = recentLogs.find(l => l.lift === lift && l.completed);
+  if (lastLog) {
+    const primaryMovement = lastLog.movements?.find(m => m.name.toLowerCase().includes(lift.toLowerCase()));
+    const topSet = primaryMovement?.sets?.[0];
+    
+    // LEAPTER AI SYNC: Synchronizing targets with TrainingProgramLogic.md
+    const prevTargetReps = phase === "accumulation" ? 5 : 3;
+    const prevTargetRPE = phase === "accumulation" ? 8 : 9;
+
+    if (topSet) {
+      const actualReps = topSet.reps;
+      const actualRPE = topSet.rpe || 8;
+
+      if (actualReps === prevTargetReps && actualRPE === prevTargetRPE) {
+        autoregulationNote = "Performance matched target. Maintaining trajectory.";
+      } else if (actualReps === prevTargetReps && actualRPE < prevTargetRPE) {
+        // Condition: Easier than expected
+        autoregulationNote = "Exceeded expectations. Strategic back-off reduction applied.";
+        backoffMultiplier *= 0.925; 
+      } else if (actualReps < prevTargetReps || actualRPE > prevTargetRPE) {
+        // Condition: Harder than expected
+        autoregulationNote = "Intensity threshold crossed. Banking capacity.";
+        intensityPct += 0.01; 
+      } else {
+        // Failure
+        autoregulationNote = "Technical failure detected. Emergency 10% load drop.";
+        intensityPct -= 0.05;
+        backoffMultiplier *= 0.85;
+      }
+    }
+  }
+
+  // Decision: Pre-session readiness check (Sleep/Fatigue)
+  // If no specific override, we check the metadata or session context
+  if ((overrides?.sleepQuality || 10) <= 2) {
+    intensityPct *= 0.97;
+    autoregulationNote += " Proactive fatigue reduction (Sleep < 3).";
+  }
+
+  // Fitness-Fatigue adjustment (Macro-Trend)
   const liftLogs = recentLogs.filter((l) => l.lift === lift && l.completed).slice(-3);
   if (liftLogs.length > 0) {
     const avgRPE = liftLogs.reduce((acc, log) => {
       const m = log.movements?.find(m => m.name.toLowerCase().includes(lift.toLowerCase()));
       const sets = m?.sets || log.sets || [];
-      if (sets.length === 0) return acc + 7.2;
-      return acc + (sets.reduce((s, set) => s + (set.rpe ?? 7.2), 0) / sets.length);
+      if (sets.length === 0) return acc + 8;
+      return acc + (sets.reduce((s, set) => s + (set.rpe ?? 8), 0) / sets.length);
     }, 0) / liftLogs.length;
 
-    if (avgRPE < 7.0) intensityPct = Math.min(intensityPct + 0.02, maxPct + 0.05);
-    if (avgRPE > 8.5) intensityPct = Math.max(intensityPct - 0.02, minPct);
+    if (avgRPE < 7.5) intensityPct = Math.min(intensityPct + 0.01, maxPct + 0.03);
+    if (avgRPE > 8.5) intensityPct = Math.max(intensityPct - 0.01, minPct);
   }
 
   const primaryWeight = Math.round((current1RM * intensityPct) / 2.5) * 2.5;
-  const backoffWeight = Math.round((primaryWeight * 0.90) / 2.5) * 2.5;
+  const backoffWeight = Math.round((primaryWeight * backoffMultiplier) / 2.5) * 2.5;
 
   const movements: MovementPrescription[] = [];
   
@@ -228,12 +281,13 @@ export function prescribeNextSession(
     name: lift.charAt(0).toUpperCase() + lift.slice(1),
     type: "primary",
     sets: phase === "accumulation" 
-      ? [{ label: "Top Set", reps: 8, weight: primaryWeight, rpeTarget: 7 }, ...Array(backoffSetCount).fill(null).map(() => ({ label: "Back-off", reps: 8, weight: backoffWeight, rpeTarget: 6 }))]
+      ? [{ label: "Top Set", reps: 5, weight: primaryWeight, rpeTarget: 8 }, ...Array(backoffSetCount).fill(null).map(() => ({ label: "Back-off", reps: 5, weight: backoffWeight, rpeTarget: 7 }))]
       : phase === "transmutation"
-      ? [{ label: "Top Set", reps: 4, weight: primaryWeight, rpeTarget: 8 }, ...Array(backoffSetCount + 1).fill(null).map(() => ({ label: "Back-off", reps: 4, weight: backoffWeight, rpeTarget: 7 }))]
-      : [{ label: "Top Single", reps: 1, weight: primaryWeight, rpeTarget: 9 }, { label: "Back-off", reps: 2, weight: backoffWeight, rpeTarget: 7 }],
+      ? [{ label: "Top Set", reps: 3, weight: primaryWeight, rpeTarget: 9 }, ...Array(backoffSetCount + 1).fill(null).map(() => ({ label: "Back-off", reps: 3, weight: backoffWeight, rpeTarget: 8 }))]
+      : [{ label: "Top Single", reps: 1, weight: primaryWeight, rpeTarget: 9.5 }, { label: "Back-off", reps: 2, weight: backoffWeight, rpeTarget: 8 }],
     note: (isMasters ? "Reduced volume for joint preservation." : "Focus on technical proficiency.") + noteSuffix,
-    alternatives: EXERCISE_ALTERNATIVES[lift.charAt(0).toUpperCase() + lift.slice(1)] || []
+    alternatives: EXERCISE_ALTERNATIVES[lift.charAt(0).toUpperCase() + lift.slice(1)] || [],
+    activeRecovery: ACTIVE_RECOVERY[lift]
   });
 
   // 2. ADD SPECIFIC VARIANT (Logic-driven by Weak Point + Neural Adaptation)
@@ -261,7 +315,8 @@ export function prescribeNextSession(
       rpeTarget: 7
     })),
     note: `Corrective variant for ${userMetadata?.weakPoint || "general balance"}.`,
-    alternatives: EXERCISE_ALTERNATIVES[variant] || []
+    alternatives: EXERCISE_ALTERNATIVES[variant] || [],
+    activeRecovery: ACTIVE_RECOVERY[lift]
   });
 
   // 3. ADD ACCESSORIES & GPP (AI Smart Rotation)
@@ -317,7 +372,7 @@ export function prescribeNextSession(
     lift,
     movements,
     phase,
-    overallNote: buildNote(phase, intensityPct)
+    overallNote: buildNote(phase, intensityPct) + (autoregulationNote ? ` [AI Agent: ${autoregulationNote}]` : "")
   };
 }
 
