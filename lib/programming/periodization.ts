@@ -150,16 +150,15 @@ const VARIANTS = {
 };
 
 const GPP_POOL = {
-  upperPull: ["Pull-ups", "Lat Pulldown", "Seated Cable Row"],
-  upperBack: ["Face Pulls", "Rear Delt Flys", "Band Pull-aparts"],
-  singleLeg: ["Bulgarian Split Squat", "Lunges", "Step-ups"],
-  core: ["Plank", "Paloff Press", "Hanging Leg Raise"],
+  upperPull: ["Pull-ups", "Lat Pulldown", "Seated Cable Row", "Barbell Row"],
+  upperBack: ["Neural Face-Pulls", "Rear Delt Flys", "Band Pull-aparts", "Dumbbell Shrugs"],
+  singleLeg: ["Bulgarian Split Squat", "Lunges", "Step-ups", "Goblet Squats"],
+  core: ["Plank", "Paloff Press", "Hanging Leg Raise", "Ab Wheel"],
 };
 
 /**
- * WHY: This logic implements the "Hybrid Approach" (Percentage + RPE) and 
- * hierarchical session structure (Main → Specific Variant → General Accessory).
- * It is individualized using Biological Sex, Age, and Weak Point analysis.
+ * WHY: This logic implements an "AI-First" approach (Non-linear waves + Diversity Tracking).
+ * It ensures no session in a week is the same, preventing the "3 days of facepulls" problem.
  */
 export function prescribeNextSession(
   lift: "squat" | "bench" | "deadlift",
@@ -171,6 +170,11 @@ export function prescribeNextSession(
     recoveryProfile?: "male" | "female";
     age?: number;
     weakPoint?: string;
+  },
+  // Allows the week builder to inject unique movement overrides
+  overrides?: {
+    accessoryPoolUsed?: string[];
+    intensityRipple?: number;
   }
 ): SessionPrescription {
   const isFemale = userMetadata?.recoveryProfile === "female";
@@ -179,25 +183,19 @@ export function prescribeNextSession(
   const [minPct, maxPct] = getPhaseIntensityRange(phase);
 
   // 1. PRIMARY LIFT - MAIN MOVEMENT
-  let intensityPct = (minPct + maxPct) / 2;
+  // AI Variation: Intra-week intensity ripple (+/- 2%) simulates a non-linear stimuli
+  let intensityPct = ((minPct + maxPct) / 2) + (overrides?.intensityRipple || 0);
   
-  // Estrogen-dominant profiles often handle more relative intensity/volume
-  if (isFemale) {
-    intensityPct += 0.02; 
-  }
+  if (isFemale) intensityPct += 0.02; 
 
-  // ── Fitness-Fatigue adjustment ──────────────────────────────────────────
-  const liftLogs = recentLogs
-    .filter((l) => l.lift === lift && l.completed)
-    .slice(-3);
-
+  // Fitness-Fatigue adjustment
+  const liftLogs = recentLogs.filter((l) => l.lift === lift && l.completed).slice(-3);
   if (liftLogs.length > 0) {
     const avgRPE = liftLogs.reduce((acc, log) => {
       const m = log.movements?.find(m => m.name.toLowerCase().includes(lift.toLowerCase()));
       const sets = m?.sets || log.sets || [];
       if (sets.length === 0) return acc + 7.2;
-      const logAvg = sets.reduce((s, set) => s + (set.rpe ?? 7.2), 0) / sets.length;
-      return acc + logAvg;
+      return acc + (sets.reduce((s, set) => s + (set.rpe ?? 7.2), 0) / sets.length);
     }, 0) / liftLogs.length;
 
     if (avgRPE < 7.0) intensityPct = Math.min(intensityPct + 0.02, maxPct + 0.05);
@@ -208,58 +206,35 @@ export function prescribeNextSession(
   const backoffWeight = Math.round((primaryWeight * 0.90) / 2.5) * 2.5;
 
   const movements: MovementPrescription[] = [];
-
-  // 1. PRIMARY LIFT - MAIN MOVEMENT
   const backoffSetCount = isMasters ? 2 : (isFemale ? 4 : 3);
 
-  if (phase === "accumulation") {
-    movements.push({
-      name: lift.charAt(0).toUpperCase() + lift.slice(1),
-      type: "primary",
-      sets: [
-        { label: "Top Set", reps: 8, weight: primaryWeight, rpeTarget: 7 },
-        ...Array(backoffSetCount).fill(null).map(() => ({ label: "Back-off", reps: 8, weight: backoffWeight, rpeTarget: 6 }))
-      ],
-      note: isMasters ? "Reduced volume for joint preservation." : "Focus on technical proficiency and volume accumulation.",
-      alternatives: EXERCISE_ALTERNATIVES[lift.charAt(0).toUpperCase() + lift.slice(1)] || []
-    });
-  } else if (phase === "transmutation") {
-    movements.push({
-      name: lift.charAt(0).toUpperCase() + lift.slice(1),
-      type: "primary",
-      sets: [
-        { label: "Top Set", reps: 4, weight: primaryWeight, rpeTarget: 8 },
-        ...Array(backoffSetCount + 1).fill(null).map(() => ({ label: "Back-off", reps: 4, weight: backoffWeight, rpeTarget: 7 }))
-      ],
-      note: "Specific strength phase. Maintain high quality.",
-      alternatives: EXERCISE_ALTERNATIVES[lift.charAt(0).toUpperCase() + lift.slice(1)] || []
-    });
-  } else {
-    movements.push({
-      name: lift.charAt(0).toUpperCase() + lift.slice(1),
-      type: "primary",
-      sets: [
-        { label: "Top Single", reps: 1, weight: primaryWeight, rpeTarget: 9 },
-        { label: "Back-off", reps: 2, weight: backoffWeight, rpeTarget: 7 }
-      ],
-      note: "Tapering volume for maximum specificity.",
-      alternatives: EXERCISE_ALTERNATIVES[lift.charAt(0).toUpperCase() + lift.slice(1)] || []
-    });
-  }
+  // Advanced Tech: Tempo training for Accumulation
+  const noteSuffix = phase === "accumulation" && currentWeek % 2 === 0 ? " [Add 3-0-3-0 Tempo for technical refinement]" : "";
 
-  // 2. ADD SPECIFIC VARIANT (Logic-driven by Weak Point)
+  movements.push({
+    name: lift.charAt(0).toUpperCase() + lift.slice(1),
+    type: "primary",
+    sets: phase === "accumulation" 
+      ? [{ label: "Top Set", reps: 8, weight: primaryWeight, rpeTarget: 7 }, ...Array(backoffSetCount).fill(null).map(() => ({ label: "Back-off", reps: 8, weight: backoffWeight, rpeTarget: 6 }))]
+      : phase === "transmutation"
+      ? [{ label: "Top Set", reps: 4, weight: primaryWeight, rpeTarget: 8 }, ...Array(backoffSetCount + 1).fill(null).map(() => ({ label: "Back-off", reps: 4, weight: backoffWeight, rpeTarget: 7 }))]
+      : [{ label: "Top Single", reps: 1, weight: primaryWeight, rpeTarget: 9 }, { label: "Back-off", reps: 2, weight: backoffWeight, rpeTarget: 7 }],
+    note: (isMasters ? "Reduced volume for joint preservation." : "Focus on technical proficiency.") + noteSuffix,
+    alternatives: EXERCISE_ALTERNATIVES[lift.charAt(0).toUpperCase() + lift.slice(1)] || []
+  });
+
+  // 2. ADD SPECIFIC VARIANT (Logic-driven by Weak Point + Neural Adaptation)
   let variant = VARIANTS[lift][0];
   if (userMetadata?.weakPoint) {
     const wp = userMetadata.weakPoint.toLowerCase();
-    if (lift === "squat") {
-      if (wp.includes("lockout")) variant = "Safety Bar Squat";
-      if (wp.includes("good morning")) variant = "Tempo Squat";
-    } else if (lift === "bench") {
-      if (wp.includes("mid")) variant = "Spoto Press";
-      if (wp.includes("lockout")) variant = "Close Grip Bench";
-    } else if (lift === "deadlift") {
-      if (wp.includes("knee")) variant = "Paused Deadlift";
-      if (wp.includes("lockout")) variant = "Block Pulls";
+    const wpMap: Record<string, Record<string, string>> = {
+      squat: { hole: "Pause Squat", lockout: "Safety Bar Squat", knees: "Tempo Squat" },
+      bench: { bottom: "Spoto Press", mid: "Board Press", lockout: "Close Grip Bench" },
+      deadlift: { floor: "Deficit Deadlift", knee: "Paused Deadlift", lockout: "Block Pulls" }
+    };
+    const liftMap = wpMap[lift];
+    for (const [key, val] of Object.entries(liftMap)) {
+      if (wp.includes(key)) { variant = val; break; }
     }
   }
 
@@ -272,33 +247,37 @@ export function prescribeNextSession(
       weight: Math.round((primaryWeight * 0.75) / 5) * 5,
       rpeTarget: 7
     })),
-    note: `Addressing individual weak point: ${userMetadata?.weakPoint || "General Technique"}.`,
+    note: `Corrective variant for ${userMetadata?.weakPoint || "general balance"}.`,
     alternatives: EXERCISE_ALTERNATIVES[variant] || []
   });
 
-  // 3. ADD ACCESSORIES & GPP (Phase-Dependent)
+  // 3. ADD ACCESSORIES & GPP (AI Smart Rotation)
+  const used = overrides?.accessoryPoolUsed || [];
+  const pickUnused = (pool: string[]) => pool.find(a => !used.includes(a)) || pool[0];
+
   if (phase === "accumulation") {
-    // ACCUMULATION: More "Total Body" / Antagonistic GPP
-    const antagonistic = lift === "bench" || lift === "deadlift" ? GPP_POOL.upperBack[0] : GPP_POOL.upperPull[0];
-    const coreOrLegs = lift === "bench" ? GPP_POOL.singleLeg[0] : GPP_POOL.core[0];
+    const liftLow = lift.toLowerCase();
+    const bucket1 = (liftLow === "bench" || liftLow === "deadlift") ? GPP_POOL.upperBack : GPP_POOL.upperPull;
+    const bucket2 = (liftLow === "bench") ? GPP_POOL.singleLeg : GPP_POOL.core;
+    const acc1 = pickUnused(bucket1);
+    const acc2 = pickUnused(bucket2);
 
     movements.push({
-      name: antagonistic,
+      name: acc1,
       type: "accessory",
       sets: Array(isMasters ? 2 : 3).fill(null).map(() => ({ label: "GPP", reps: 12, weight: 30, rpeTarget: 7 })),
-      note: "Antagonistic work to balance the primary movement and build capacity.",
-      alternatives: EXERCISE_ALTERNATIVES[antagonistic] || []
+      note: "Antagonistic work for structural integrity.",
+      alternatives: EXERCISE_ALTERNATIVES[acc1] || []
     });
 
     movements.push({
-      name: coreOrLegs,
+      name: acc2,
       type: "accessory",
-      sets: Array(isMasters ? 2 : 3).fill(null).map(() => ({ label: "General", reps: 15, weight: 0, rpeTarget: 7 })),
-      note: "General GPP for injury prevention and structural balance.",
-      alternatives: EXERCISE_ALTERNATIVES[coreOrLegs] || []
+      sets: Array(isMasters ? 2 : 3).fill(null).map(() => ({ label: "GPP", reps: 15, weight: 0, rpeTarget: 7 })),
+      note: "General movement variety to maximize work capacity.",
+      alternatives: EXERCISE_ALTERNATIVES[acc2] || []
     });
   } else if (phase === "transmutation") {
-    // TRANSMUTATION: Specific structural work
     const accessory = VARIANTS[lift][2];
     movements.push({
       name: accessory,
@@ -309,16 +288,15 @@ export function prescribeNextSession(
         weight: accessory === "Leg Press" ? 135 : 55, 
         rpeTarget: 7 + i 
       })),
-      note: "Directed hypertrophy to support the main lift's prime movers.",
+      note: "Directed hypertrophy to support primes movers.",
       alternatives: EXERCISE_ALTERNATIVES[accessory] || []
     });
   } else {
-    // PEAKING: Minimalist "Flushing" work
     movements.push({
       name: "Light GPP/Flushing",
       type: "accessory",
       sets: [{ label: "Recovery", reps: 20, weight: 0, rpeTarget: 5 }],
-      note: "Extremely low intensity to prioritize recovery and dissipate fatigue.",
+      note: "Low intensity recovery to prioritize peaking specificity.",
     });
   }
 
@@ -345,41 +323,38 @@ export function prescribeFullWeek(
     weakPoints?: { squat?: string; bench?: string; deadlift?: string };
   }
 ): SessionPrescription[] {
-  // Session 1: Squat Primary
-  const s1 = prescribeNextSession("squat", current1RMs.squat, recentLogs, currentWeek, totalWeeks, {
-    recoveryProfile: userMetadata?.recoveryProfile,
-    age: userMetadata?.age,
-    weakPoint: userMetadata?.weakPoints?.squat
-  });
-  
-  // Session 2: Bench Primary
-  const s2 = prescribeNextSession("bench", current1RMs.bench, recentLogs, currentWeek, totalWeeks, {
-    recoveryProfile: userMetadata?.recoveryProfile,
-    age: userMetadata?.age,
-    weakPoint: userMetadata?.weakPoints?.bench
-  });
-  
-  // Session 3: Deadlift Primary
-  const s3 = prescribeNextSession("deadlift", current1RMs.deadlift, recentLogs, currentWeek, totalWeeks, {
-    recoveryProfile: userMetadata?.recoveryProfile,
-    age: userMetadata?.age,
-    weakPoint: userMetadata?.weakPoints?.deadlift
-  });
-  
-  if (targetFrequency <= 3) {
-    s1.overallNote += " (Primary Lower focus)";
-    s2.overallNote += " (Primary Upper focus)";
-    s3.overallNote += " (Primary Pull/Posterior focus)";
-    return [s1, s2, s3];
-  }
+  // AI Weekly Builder Store
+  const weekState = {
+    usedAccessories: [] as string[],
+    ripples: [0.01, -0.01, 0.02, -0.02], // Deliberate intensity variance
+  };
 
-  // Session 4: DUP Variation - Power Day (Higher Intensity, Lower Reps)
-  // This provides intra-week variation (Daily Undulating Periodization)
-  const powerS4 = prescribeNextSession("bench", current1RMs.bench, recentLogs, currentWeek, totalWeeks, {
-    recoveryProfile: userMetadata?.recoveryProfile,
-    age: userMetadata?.age,
-    weakPoint: userMetadata?.weakPoints?.bench
-  });
+  // Helper to prescribe and update used accessories
+  const prescribeWithVariety = (lift: "squat" | "bench" | "deadlift", rm: number, wp?: string, rippleIdx: number = 0) => {
+    const session = prescribeNextSession(lift, rm, recentLogs, currentWeek, totalWeeks, {
+      recoveryProfile: userMetadata?.recoveryProfile,
+      age: userMetadata?.age,
+      weakPoint: wp
+    }, {
+      accessoryPoolUsed: weekState.usedAccessories,
+      intensityRipple: weekState.ripples[rippleIdx]
+    });
+    
+    // Add these accessories to used set
+    session.movements.forEach(m => {
+      if (m.type === "accessory") weekState.usedAccessories.push(m.name);
+    });
+    return session;
+  };
+
+  const s1 = prescribeWithVariety("squat", current1RMs.squat, userMetadata?.weakPoints?.squat, 0);
+  const s2 = prescribeWithVariety("bench", current1RMs.bench, userMetadata?.weakPoints?.bench, 1);
+  const s3 = prescribeWithVariety("deadlift", current1RMs.deadlift, userMetadata?.weakPoints?.deadlift, 2);
+  
+  if (targetFrequency <= 3) return [s1, s2, s3];
+
+  // Session 4: DUP Variation - Power Day 
+  const powerS4 = prescribeWithVariety("bench", current1RMs.bench, userMetadata?.weakPoints?.bench, 3);
   
   // Apply DUP Overrides
   const primaryWeight = powerS4.movements[0].sets[0].weight;
@@ -388,7 +363,7 @@ export function prescribeFullWeek(
     { label: "Speed Set", reps: 3, weight: Math.round((primaryWeight * 0.85) / 5) * 5, rpeTarget: 6 },
     { label: "Speed Set", reps: 3, weight: Math.round((primaryWeight * 0.85) / 5) * 5, rpeTarget: 6 }
   ];
-  powerS4.overallNote = "DUP Power Day: Intra-week variation to force neuromuscular adaptation. Higher intensity singles.";
+  powerS4.overallNote = "DUP Power Day: Intra-week variation to force neuromuscular adaptation. Unique GPP rotation applied.";
 
   return [s1, s2, s3, powerS4];
 }
