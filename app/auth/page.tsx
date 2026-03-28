@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ChevronLeft, Loader2 } from "lucide-react";
 import BrandLogo from "@/components/ui/BrandLogo";
+import { PassiveQuote } from "@/components/ui/PassiveQuote";
 import { useAuth } from "@/lib/auth-context";
 
 type Tab = "login" | "signup";
@@ -18,9 +19,7 @@ function AuthContent() {
     userProfile, 
     user, 
     loading, 
-    forceReady,
-    logDebug,
-    debugLog 
+    forceReady 
   } = useAuth();
   const [hasRedirected, setHasRedirected] = useState(false);
   const [tab, setTab] = useState<Tab>("login");
@@ -40,10 +39,9 @@ function AuthContent() {
     }
   }, [searchParams]);
 
-  // Handle automatic redirect if user becomes authenticated (fixes mobile redirect hang)
+  // Handle automatic redirect if user becomes authenticated
   useEffect(() => {
     if (!loading && user && !hasRedirected && !successRoute) {
-       logDebug("User settled. Preparing transition...");
        setHasRedirected(true);
        if (userProfile?.onboardingComplete) {
          setSuccessRoute({ url: "/", message: "Diverting to athlete cockpit..." });
@@ -79,13 +77,10 @@ function AuthContent() {
 
   const handleGoogle = async (e?: React.MouseEvent, mode: 'popup' | 'redirect' = 'popup') => {
     if (e) e.preventDefault();
-    logDebug(`Google (${mode}) triggered`);
     setIsLoading(true);
     setError(null);
     try {
-      logDebug(`Requesting Google Sign-In via ${mode}...`);
       const { isNewUser } = await signInWithGoogle(mode === 'redirect');
-      logDebug(`Sign-in complete. New User: ${isNewUser}`);
       
       if (isNewUser) {
         setSuccessRoute({ url: "/profile-setup", message: "Account secured. Diverting to profile configuration..." });
@@ -95,7 +90,6 @@ function AuthContent() {
     } catch (e: unknown) {
       console.error("Google sign-in error:", e);
       const msg = e instanceof Error ? e.message : "Google sign-in failed.";
-      logDebug(`Error: ${msg}`);
       if (!msg.includes("popup-closed") && !msg.includes("cancelled-by-user")) {
         setError(msg);
       }
@@ -106,7 +100,6 @@ function AuthContent() {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    logDebug(`Email ${tab} triggered for ${email}`);
     setError(null);
 
     if (tab === "signup" && password !== confirmPassword) {
@@ -121,19 +114,14 @@ function AuthContent() {
     setIsLoading(true);
     try {
       if (tab === "signup") {
-        logDebug("Creating user...");
         await signUpWithEmail(email, password);
-        logDebug("User created.");
         setSuccessRoute({ url: "/profile-setup", message: "Account secured. Diverting to profile configuration..." });
       } else {
-        logDebug("Signing in...");
         await signInWithEmail(email, password);
-        logDebug("Sign-in success.");
         setSuccessRoute({ url: "/", message: "Identity verified. Initializing systems..." });
       }
     } catch (e: unknown) {
       const raw = e instanceof Error ? e.message : "";
-      logDebug(`Email error: ${raw}`);
       if (raw.includes("user-not-found") || raw.includes("wrong-password") || raw.includes("invalid-credential")) {
         setError("Invalid email or password.");
       } else if (raw.includes("email-already-in-use")) {
@@ -151,35 +139,18 @@ function AuthContent() {
   if (loading) {
     return (
       <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center gap-6">
-        <BrandLogo size={64} glow={true} />
-        <div className="flex flex-col items-center gap-2">
-           <p className="text-xs tracking-widest uppercase text-text-secondary animate-pulse">Stage 2: Core Handshake...</p>
-           {/* Real-time Handshake Logs */}
-           {debugLog.length > 0 && (
-             <div className="w-full mt-4 p-4 rounded-xl bg-black/40 border border-white/5 font-mono text-[9px] space-y-1 animate-in fade-in slide-in-from-bottom-2">
-               <p className="text-white/20 mb-2 uppercase font-black text-center">Boot Sequence Logs</p>
-               {debugLog.map((log, i) => (
-                 <div key={i} className="flex gap-2">
-                   <span className="text-primary/40">[{i}]</span>
-                   <span className="text-text-secondary text-wrap">{log}</span>
-                 </div>
-               ))}
-             </div>
-           )}
-           <button 
-             onClick={() => {
-               alert("OVERRIDING HANDSHAKE...");
-               forceReady();
-             }}
-             className="mt-6 text-[10px] text-primary/40 uppercase font-black hover:text-white transition-colors p-4"
-           >
-             Manual Override (Forced Entry)
-           </button>
-        </div>
+        <PassiveQuote />
+        <button 
+          onClick={() => forceReady()}
+          className="mt-12 text-[10px] text-primary/20 uppercase font-black hover:text-white transition-colors p-4"
+        >
+          Manual Override
+        </button>
       </div>
     );
   }
 
+  // Prevent "jumps" or flickers by checking for active transitions or signed-in state
   if (successRoute) {
     return (
       <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center animate-in fade-in zoom-in duration-500 text-center gap-6">
@@ -189,8 +160,18 @@ function AuthContent() {
         </div>
         <div className="space-y-2">
           <h2 className="text-2xl font-black tracking-tight">{tab === "login" ? "Access Granted" : "Welcome to Deadlift.ai"}</h2>
-          <p className="text-text-secondary text-sm font-mono tracking-widest uppercase">{successRoute.message}</p>
+          <p className="text-text-secondary text-[10px] font-bold tracking-widest uppercase mt-4 animate-pulse">{successRoute.message}</p>
         </div>
+      </div>
+    );
+  }
+
+  // If we have a user but no successRoute yet, we're in the middle of a profile fetch/redirect handshake
+  if ((user && !hasRedirected) || isLoading) {
+    return (
+      <div className="max-w-md mx-auto w-full px-4 md:px-8 py-4 md:py-8 flex flex-col min-h-[85vh] items-center justify-center animate-in fade-in duration-500 gap-8 text-center">
+        <PassiveQuote />
+        <p className="text-[10px] text-text-secondary uppercase tracking-[0.3em] font-black animate-pulse">Initializing Identity...</p>
       </div>
     );
   }
@@ -239,7 +220,6 @@ function AuthContent() {
             </svg>
             {isLoading ? "Communicating..." : "Continue with Google"}
           </button>
-          
         </div>
 
         {/* Divider */}
@@ -348,19 +328,6 @@ function AuthContent() {
           </button>
         </form>
 
-        {/* Debug Log (Visible on error or interaction) */}
-        {(debugLog.length > 0 || error) && (
-          <div className="mt-8 p-4 rounded-xl bg-black/40 border border-white/5 font-mono text-[10px] space-y-1">
-            <p className="text-white/20 mb-2 uppercase font-black">System Diagnostic Logs</p>
-            {debugLog.map((log, i) => (
-              <div key={i} className="flex gap-2">
-                <span className="text-primary/50">[{i}]</span>
-                <span className="text-text-secondary text-wrap">{log}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Bottom spacer */}
         <div className="mt-8" />
       </div>
@@ -372,8 +339,7 @@ export default function AuthPage() {
   return (
     <Suspense fallback={
       <div className="flex flex-col min-h-[85vh] items-center justify-center animate-pulse gap-6">
-        <BrandLogo size={64} glow={true} />
-        <p className="text-xs tracking-widest uppercase text-text-secondary">Stage 1: Manifesting...</p>
+        <PassiveQuote />
       </div>
     }>
       <AuthContent />
