@@ -266,23 +266,23 @@ export default function WorkoutPage() {
       {showIntro && <DashboardIntro onComplete={completeIntro} />}
       <div className="max-w-3xl mx-auto w-full px-4 md:px-8 py-4 md:py-8 space-y-6 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="pt-4 mb-2 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-        <div className="flex-1">
+      <div className="pt-4 mb-2 flex flex-row items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary mb-1">
             {todayStr}
           </p>
-          <h1 className="text-3xl font-black tracking-tight leading-none mb-3">
-            Training Session <span className="text-primary">{weeklySessions + 1}</span> <span className="text-white/20">/</span> {targetFrequency}
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-none mb-3">
+            Session <span className="text-primary">{weeklySessions + 1}</span><span className="text-white/20"> / </span>{targetFrequency}
           </h1>
-          <div className="flex flex-wrap items-center gap-3">
-             <div className={cn("text-[8px] sm:text-[9px] font-black px-3 py-1.5 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10", phaseInfo.color)}>
+          <div className="flex flex-wrap items-center gap-2">
+             <div className={cn("text-[9px] sm:text-[10px] font-black px-2.5 py-1 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10", phaseInfo.color)}>
                {phaseInfo.label}
              </div>
-             
+
              {trendMessage && (
                <div className={cn(
-                 "text-[8px] sm:text-[9px] font-black px-3 py-1.5 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10 flex items-center gap-2",
-                 neuralStatus === "fatigued" ? "text-red-400 border-red-500/20" : 
+                 "text-[9px] sm:text-[10px] font-black px-2.5 py-1 rounded-full inline-block uppercase tracking-widest bg-surface border border-white/10 flex items-center gap-1.5",
+                 neuralStatus === "fatigued" ? "text-red-400 border-red-500/20" :
                  neuralStatus === "primed" ? "text-green-400 border-green-500/20" : "text-primary border-primary/20"
                )}>
                  <Activity size={10} className={cn(neuralStatus === "fatigued" ? "animate-pulse" : "")} />
@@ -291,32 +291,33 @@ export default function WorkoutPage() {
              )}
 
              <p className="text-text-secondary text-[9px] sm:text-[10px] font-black tracking-widest uppercase">
-               {userProfile?.onboardingData?.goalType === "meet" 
-                 ? `${totalWeeks - currentWeek} Weeks to Competition` 
-                 : `Week ${currentWeek} of ${totalWeeks}`}
+               {userProfile?.onboardingData?.goalType === "meet"
+                 ? `${totalWeeks - currentWeek}w to Meet`
+                 : `Wk ${currentWeek}/${totalWeeks}`}
              </p>
           </div>
         </div>
-        
-        <div className="flex gap-2 sm:gap-3 shrink-0 items-center">
-          <button 
+
+        <div className="flex gap-2 shrink-0 items-center pt-1">
+          {/* Weekly Hub — icon-only on mobile, full pill on sm+ */}
+          <button
             onClick={() => router.push("/workout/week")}
-            className="bg-white/5 border border-white/20 hover:bg-white/10 hover:border-primary/60 rounded-3xl px-6 sm:px-8 py-4 transition-all duration-300 group flex items-center gap-4 shrink-0 shadow-lg shadow-black/20"
+            className="bg-white/5 border border-white/20 hover:bg-white/10 hover:border-primary/60 rounded-2xl p-2.5 sm:rounded-3xl sm:px-6 sm:py-4 transition-all duration-300 group flex items-center gap-3 shrink-0 shadow-lg shadow-black/20"
           >
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 transition-all border border-primary/20">
-              <Layout size={20} className="sm:size-[24px]" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 transition-all border border-primary/20">
+              <Layout size={20} />
             </div>
-            <div className="text-left">
-               <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-text-secondary group-hover:text-white transition-colors">Birdseye View</p>
-               <p className="text-xs sm:text-sm font-black text-white leading-tight">Weekly Hub</p>
+            <div className="hidden sm:block text-left">
+               <p className="text-[11px] font-black uppercase tracking-widest text-text-secondary group-hover:text-white transition-colors">Birdseye View</p>
+               <p className="text-sm font-black text-white leading-tight">Weekly Hub</p>
             </div>
           </button>
 
-          <button 
+          <button
             onClick={() => setShowSettings(!showSettings)}
-            className="bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl p-2.5 sm:p-3 transition-all duration-300 text-text-secondary hover:text-white"
+            className="bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl p-2.5 transition-all duration-300 text-text-secondary hover:text-white"
           >
-            <Settings size={20} className={cn(showSettings && "rotate-90", "transition-transform duration-500 sm:size-[22px]")} />
+            <Settings size={20} className={cn(showSettings && "rotate-90", "transition-transform duration-500")} />
           </button>
         </div>
       </div>
