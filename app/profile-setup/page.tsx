@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { User, CheckCircle, XCircle, Loader2, ArrowRight, ChevronLeft, Camera } from "lucide-react";
+import { User, CheckCircle, XCircle, Loader2, ArrowRight, ChevronLeft, Camera, AlertCircle, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AvatarGrid, AVATARS } from "@/components/ui/AvatarGrid";
 import { db } from "@/lib/firebase";
 import { doc, setDoc, collection, query, where, getDocs, serverTimestamp } from "firebase/firestore";
 
-type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid";
+type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
 
 /**
  * One-time profile setup page shown to new users after sign-up or Google auth.
@@ -64,6 +64,7 @@ export default function ProfileSetupPage() {
     }
 
     setUsernameStatus("checking");
+    console.log("[username-check] Starting check for:", trimmed);
     debounceRef.current = setTimeout(async () => {
       try {
         const q = query(
@@ -71,17 +72,31 @@ export default function ProfileSetupPage() {
           where("username", "==", trimmed.toLowerCase())
         );
         const snap = await getDocs(q);
+        
         // Available if no docs, or the only match is the current user
         const takenByOther = snap.docs.some((d) => d.id !== user?.uid);
+        console.log("[username-check] Results found:", snap.docs.length, "takenByOther:", takenByOther);
         setUsernameStatus(takenByOther ? "taken" : "available");
-      } catch {
-        setUsernameStatus("idle");
+      } catch (err) {
+        console.error("[username-check] Error encountered:", err);
+        // If we can't check, we'll mark as 'error' so we can show a message
+        setUsernameStatus("error");
       }
     }, 500);
   };
 
   const handleSave = async () => {
-    if (!user || usernameStatus !== "available") return;
+    console.log("[handleSave] Attempting save with state:", { 
+      hasUser: !!user, 
+      usernameStatus, 
+      isSaving,
+      username: username.trim()
+    });
+    
+    if (!user || isSaving || usernameStatus === "taken" || usernameStatus === "invalid" || !username.trim()) {
+      console.warn("[handleSave] Conditions not met. Aborting.");
+      return;
+    }
 
     setIsSaving(true);
     setError(null);
@@ -138,7 +153,8 @@ export default function ProfileSetupPage() {
       case "checking": return <Loader2 size={16} className="animate-spin text-text-secondary" />;
       case "available": return <CheckCircle size={16} className="text-green-400" />;
       case "taken": return <XCircle size={16} className="text-red-400" />;
-      case "invalid": return <XCircle size={16} className="text-yellow-400" />;
+      case "invalid": return <HelpCircle size={16} className="text-yellow-400" />;
+      case "error": return <AlertCircle size={16} className="text-amber-400" />;
       default: return null;
     }
   };
@@ -250,7 +266,13 @@ export default function ProfileSetupPage() {
         <button
           id="profile-setup-save-btn"
           onClick={handleSave}
-          disabled={isSaving || usernameStatus !== "available"}
+          disabled={
+            isSaving || 
+            usernameStatus === "taken" || 
+            usernameStatus === "invalid" || 
+            usernameStatus === "checking" ||
+            !username.trim()
+          }
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSaving ? (

@@ -8,7 +8,7 @@ import { db } from "@/lib/firebase";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import type { WorkoutLog } from "@/lib/programming/periodization";
 import { cn } from "@/lib/utils";
-import { ProgrammingTransparency } from "@/components/ui/ProgrammingTransparency";
+import ProgrammingTransparency from "@/components/ui/ProgrammingTransparency";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STREAK LOGIC
